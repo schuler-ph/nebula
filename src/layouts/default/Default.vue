@@ -4,31 +4,28 @@
       <v-container class="fill-height d-flex align-center">
         <v-avatar class="me-10 ms-4" :image="nebulaLogo" size="32"></v-avatar>
 
-        <v-btn v-for="link in links" :key="link" variant="text" color="white">
-          {{ link }}
+        <v-btn
+          v-for="link in links"
+          :key="link.title"
+          variant="text"
+          color="white"
+          @click="$router.push(link.to)"
+        >
+          {{ link.title }}
         </v-btn>
 
         <v-spacer></v-spacer>
-        <v-btn color="white">
+        <v-btn prepend-icon="mdi-chevron-down" color="white">
           User
 
           <v-menu location="start" activator="parent">
             <v-list>
               <v-list-item>
-                <v-btn @click="logout" color="deep-purple-darken-2"
-                  >logout</v-btn
-                >
+                <v-btn class="ma-3" @click="logout">logout</v-btn>
               </v-list-item>
             </v-list>
           </v-menu>
         </v-btn>
-        <!-- <v-responsive max-width="260">
-          <v-text-field
-            prepend-icon="mdi-eye"
-            density="compact"
-            hide-details
-          ></v-text-field>
-        </v-responsive> -->
       </v-container>
     </v-app-bar>
 
@@ -69,5 +66,14 @@ import nebulaBg from "@/assets/bg/appBarNebula.jpg";
 import useAuth from "@/hooks/useAuth";
 const { logout } = useAuth();
 
-const links = ["Dashboard", "Messages", "Profile", "Updates"];
+const links = [
+  {
+    title: "Dashboard",
+    to: "/",
+  },
+  {
+    title: "About",
+    to: "/about",
+  },
+];
 </script>

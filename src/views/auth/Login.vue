@@ -9,23 +9,25 @@
         v-model="email"
         :rules="emailRules"
         label="Email"
-        prepend-icon="mdi-email"
+        prepend-inner-icon="mdi-email"
         required
+        color="indigo"
       ></v-text-field>
       <v-text-field
         v-model="password"
         :rules="passwordRules"
         label="Password"
-        prepend-icon="mdi-form-textbox-password"
+        prepend-inner-icon="mdi-form-textbox-password"
         required
         :type="showPassword ? '' : 'password'"
         :append-inner-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
         @click:append-inner="showPassword = !showPassword"
+        color="indigo"
       ></v-text-field>
     </v-form>
 
     <v-card-actions>
-      <v-btn class="bg-indigo" @click="submitLogin">Login</v-btn>
+      <v-btn class="bg-indigo" color="white" @click="submitLogin">Login</v-btn>
     </v-card-actions>
   </v-card>
   <v-card v-else title="Loading..."> </v-card>
@@ -36,7 +38,6 @@ import { ref } from "vue";
 import { storeToRefs } from "pinia";
 import { useAuthStore } from "@/store/authStore";
 import useAuth from "@/hooks/useAuth";
-const { login } = useAuth();
 
 const valid = ref(false);
 const email = ref(import.meta.env.VITE_SUPABASE_USER);
@@ -59,6 +60,7 @@ const passwordRules = [
 ];
 const showPassword = ref(false);
 
+const { login } = useAuth();
 const { auth_loading } = storeToRefs(useAuthStore());
 function submitLogin() {
   login(email.value, password.value);
