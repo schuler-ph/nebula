@@ -2,7 +2,11 @@
   <v-app id="inspire">
     <v-app-bar flat :image="nebulaBg" elevation="10">
       <v-container class="fill-height d-flex align-center justify-center">
-        <v-avatar class="me-10 ms-4" :image="nebulaLogo" size="32"></v-avatar>
+        <v-avatar
+          :class="xs ? '' : 'me-10 ms-4'"
+          :image="nebulaLogo"
+          size="32"
+        ></v-avatar>
 
         <v-btn
           v-for="link in links"
@@ -10,11 +14,16 @@
           variant="text"
           color="white"
           @click="$router.push(link.to)"
+          :class="xs ? 'pa-0' : ''"
         >
           {{ link.title }}
         </v-btn>
 
-        <v-btn prepend-icon="mdi-chevron-down" color="white">
+        <v-btn
+          prepend-icon="mdi-chevron-down"
+          color="white"
+          :class="xs ? 'pa-0' : ''"
+        >
           User
 
           <v-menu location="start" activator="parent">
@@ -60,7 +69,7 @@
 
 <script setup lang="ts">
 import { useDisplay } from "vuetify";
-const { smAndDown } = useDisplay();
+const { smAndDown, xs } = useDisplay();
 
 import nebulaLogo from "@/assets/logo.svg";
 import nebulaBg from "@/assets/bg/appBarNebula.jpg";
