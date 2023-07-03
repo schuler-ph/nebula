@@ -1,82 +1,44 @@
-// import jwtDecode from "jwt-decode";
-import { useAuthStore } from "@/store/authStore"
-import { supabase } from "@/lib/supabaseClient"
-
-const { loginSuccess } = useAuthStore()
+import { useAuthStore } from "@/store/authStore";
+import { supabase } from "@/lib/supabaseClient";
+import { AuthError } from "@supabase/supabase-js";
+import router from "@/router";
 
 export default () => {
-  const login = async (email: string, password: string) => {
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password
-    })
+  const { validated, rejected, startLoading } = useAuthStore();
 
-    if(error?.status) {
-      return error
-    }
-    else {
-      loginSuccess(data.session!.access_token, data.user!)
-      return null
+  const handleResponse = (error: AuthError | null) => {
+    if (error === null) {
+      validated();
+      router.push({ name: "Home" });
+    } else {
+      rejected();
     }
   };
 
-//   const refreshToken = async () => {
-//     try {
-//       const { accessToken } = await $fetch("/api/auth/refresh");
-//       setToken(accessToken);
-//       return true;
-//     } catch (error) {
-//       return false;
-//     }
-//   };
+  const initAuth = async () => {
+    startLoading();
+    const { data, error } = await supabase.auth.refreshSession();
+    handleResponse(error);
+  };
 
-//   const getUser = async () => {
-//     try {
-//       const { user } = await useFetchApi("/api/auth/user");
-//       setUser(user);
-//       return true;
-//     } catch (error) {
-//       return false;
-//     }
-//   };
+  const login = async (email: string, password: string) => {
+    startLoading();
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+    handleResponse(error);
+  };
 
-//   const reRefreshAccessToken = async () => {
-//     const authToken = useAuthToken();
-
-//     if (!authToken.value) {
-//       return;
-//     }
-
-//     const jwt: any = jwtDecode(authToken.value);
-//     const newRefreshTime = jwt.exp - 60000;
-
-//     setTimeout(async () => {
-//       await refreshToken();
-//       reRefreshAccessToken();
-//     }, newRefreshTime);
-//   };
-
-//   const initAuth = async () => {
-//     setIsLoading(true);
-//     try {
-//       if (await refreshToken()) {
-//         await getUser();
-//       }
-
-//       reRefreshAccessToken();
-//       return true;
-//     } catch (error) {
-//       return false;
-//     } finally {
-//       setIsLoading(false);
-//     }
-//   };
+  const logout = async () => {
+    const { error } = await supabase.auth.signOut();
+    router.push({ name: "Login" });
+    rejected();
+  };
 
   return {
     login,
-  //   useAuthUser,
-  //   useAuthToken,
-  //   useAuthLoading,
-  //   initAuth,
+    initAuth,
+    logout,
   };
 };

@@ -1,15 +1,21 @@
-import { defineStore } from 'pinia'
+import { defineStore } from "pinia";
 
-export const useAuthStore = defineStore('auth', {
+export const useAuthStore = defineStore("auth", {
   state: () => ({
-    auth_token: undefined as string | undefined,
-    auth_user: undefined as Object | undefined,
+    auth_valid: false,
     auth_loading: true,
   }),
   actions: {
-    loginSuccess(token: string, user: Object) {
-      this.auth_token = token
-      this.auth_user = user
+    validated() {
+      this.auth_valid = true;
+      this.auth_loading = false;
     },
-  }
-})
+    rejected() {
+      this.auth_valid = false;
+      this.auth_loading = false;
+    },
+    startLoading() {
+      this.auth_loading = true;
+    },
+  },
+});
