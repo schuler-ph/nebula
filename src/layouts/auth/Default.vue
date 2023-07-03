@@ -1,11 +1,18 @@
 <template>
   <v-app id="auth">
-    <v-main class="bg-indigo-darken-4">
-      <v-container>
-        <router-view />
-      </v-container>
+    <v-main>
+      <v-card
+        rounded="0"
+        height="100%"
+        :image="nebulaBg"
+        class="d-flex justify-center align-center"
+      >
+        <router-view
+      /></v-card>
     </v-main>
   </v-app>
 </template>
 
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import nebulaBg from "@/assets/bg/appBarNebula.jpg";
+</script>

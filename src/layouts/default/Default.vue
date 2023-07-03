@@ -1,7 +1,7 @@
 <template>
   <v-app id="inspire">
-    <v-app-bar flat :image="nebulaBg">
-      <v-container class="fill-height d-flex align-center">
+    <v-app-bar flat :image="nebulaBg" elevation="10">
+      <v-container class="fill-height d-flex align-center justify-center">
         <v-avatar class="me-10 ms-4" :image="nebulaLogo" size="32"></v-avatar>
 
         <v-btn
@@ -14,7 +14,6 @@
           {{ link.title }}
         </v-btn>
 
-        <v-spacer></v-spacer>
         <v-btn prepend-icon="mdi-chevron-down" color="white">
           User
 
@@ -32,8 +31,8 @@
     <v-main class="bg-deep-purple-lighten-5">
       <v-container>
         <v-row>
-          <v-col cols="2">
-            <v-sheet rounded="lg">
+          <v-col cols="2" :hidden="smAndDown">
+            <v-sheet rounded="lg" elevation="10">
               <v-list rounded="lg">
                 <v-list-item v-for="n in 5" :key="n" link>
                   <v-list-item-title> List Item {{ n }} </v-list-item-title>
@@ -49,7 +48,7 @@
           </v-col>
 
           <v-col>
-            <v-sheet min-height="70vh" rounded="lg">
+            <v-sheet min-height="70vh" rounded="lg" elevation="20">
               <router-view />
             </v-sheet>
           </v-col>
@@ -60,6 +59,9 @@
 </template>
 
 <script setup lang="ts">
+import { useDisplay } from "vuetify";
+const { smAndDown } = useDisplay();
+
 import nebulaLogo from "@/assets/logo.svg";
 import nebulaBg from "@/assets/bg/appBarNebula.jpg";
 
@@ -68,7 +70,7 @@ const { logout } = useAuth();
 
 const links = [
   {
-    title: "Dashboard",
+    title: "Home",
     to: "/",
   },
   {

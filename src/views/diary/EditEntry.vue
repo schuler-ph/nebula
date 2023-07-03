@@ -6,20 +6,9 @@
     >
       <v-row>
         <v-btn class="my-5" elevation="10">
-          <span v-if="date">{{ dateToIsoString(date[0]) }}</span>
-          <v-menu
-            v-model="datePickerMenu"
-            :close-on-content-click="false"
-            activator="parent"
-          >
-            <v-date-picker
-              color="primary"
-              @click:save="datePickerMenu = false"
-              @click:cancel="datePickerMenu = false"
-              v-model="date"
-            ></v-date-picker
-          ></v-menu> </v-btn
-      ></v-row>
+          <span v-if="date">{{ day }}</span>
+        </v-btn></v-row
+      >
       <v-text-field
         variant="solo-filled"
         class="w-50"
@@ -77,57 +66,50 @@
       </v-col>
     </v-row>
     <v-sheet class="d-flex justify-center mt-5">
-      <v-btn @click="submitInsert">Submit</v-btn>
+      <v-btn class="mr-4" @click="submitUpdate">Submit</v-btn>
+      <v-btn @click="$router.push({ name: 'Home' })">Cancel</v-btn>
     </v-sheet>
   </v-form>
 </template>
 
 <script setup lang="ts">
 import { ref } from "vue";
-import { InsertDto } from "@/types/supabaseHelper";
-import { getUserId, supabase } from "@/lib/supabaseClient";
-import { VDatePicker } from "vuetify/lib/labs/components.mjs";
+import { UpdateDto } from "@/types/supabaseHelper";
+import { supabase } from "@/lib/supabaseClient";
 import ContentInput from "@/components/diary/ContentInput.vue";
 import router from "@/router";
+import { useRoute } from "vue-router";
+import { onMounted } from "vue";
 
-const datePickerMenu = ref(false);
-const date = ref([new Date()]);
+const date = ref([]);
 const title = ref("");
-
 const content = ref("");
-
 const contentUni = ref("");
 const showContentUni = ref(false);
 const contentTraining = ref("");
 const showContentTraining = ref(false);
 
-async function submitInsert() {
-  const entry: InsertDto<"diary"> = {
-    day: dateToIsoString(date.value[0]),
-    user_id: await getUserId(),
+const { day } = useRoute().params;
+
+onMounted(async () => {
+  const { data, error } = await supabase.from("diary").select().eq("day", day);
+  if (error === null) {
+    title.value = data[0].title!;
+    content.value = data[0].content!;
+    contentUni.value = data[0].content_uni!;
+    contentTraining.value = data[0].content_training!;
+  }
+});
+
+async function submitUpdate() {
+  const entry: UpdateDto<"diary"> = {
     title: title.value,
     content: content.value,
     content_training: contentTraining.value,
     content_uni: contentUni.value,
   };
 
-  const { error } = await supabase.from("diary").insert(entry);
+  const { error } = await supabase.from("diary").update(entry).eq("day", day);
   router.push({ name: "Home" });
-}
-
-function dateToIsoString(date1: Date) {
-  let str = "";
-  str += date1.getFullYear();
-  str += "-";
-  if ((date1.getMonth() as number) + 1 < 10) {
-    str += 0;
-  }
-  str += date1.getMonth() + 1;
-  str += "-";
-  if ((date1.getDate() as number) < 10) {
-    str += 0;
-  }
-  str += date1.getDate();
-  return str;
 }
 </script>

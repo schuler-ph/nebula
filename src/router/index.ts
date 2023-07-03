@@ -22,6 +22,11 @@ const routes = [
         component: () => import("@/views/diary/NewEntry.vue"),
       },
       {
+        path: "edit/:day",
+        name: "EditEntry",
+        component: () => import("@/views/diary/EditEntry.vue"),
+      },
+      {
         path: "about",
         name: "About",
         component: () => import("@/views/About.vue"),

@@ -1,13 +1,13 @@
 <template>
-  <v-container class="bg-surface-variant">
-    <v-row
-      ><v-btn @click="$router.push('/new')" class="mx-auto my-5"
-        >New entry</v-btn
-      >
+  <v-container class="rounded-lg">
+    <v-row>
+      <v-btn @click="$router.push('/new')" class="mx-auto my-5">
+        New entry
+      </v-btn>
     </v-row>
     <v-row no-gutters>
       <v-col v-for="entry in diaryEntries" :key="entry.id" cols="12" sm="4">
-        <DiaryEntry :entry="entry" />
+        <DiaryEntry :entry="entry" @needRefresh="getEntries" />
       </v-col>
     </v-row>
   </v-container>
