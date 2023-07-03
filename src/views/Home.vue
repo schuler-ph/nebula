@@ -6,7 +6,7 @@
 
 <script lang="ts" setup>
 import { ref, onMounted } from 'vue'
-import { supabase } from '@/lib/supabaseClient'
+import { supabase } from '@/lib/supabaseClient';
 import { Row } from "@/types/supabaseHelper"
 
 const diaryEntries = ref<Row<'diary'>[] | null>([])
