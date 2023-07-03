@@ -50,7 +50,7 @@ import useAuth from "@/hooks/useAuth";
 import nebulaLogo from "@/assets/logo.svg";
 
 const valid = ref(false);
-const email = ref(import.meta.env.VITE_SUPABASE_USER);
+const email = ref("");
 const emailRules = [
   (value: string) => {
     if (value) return true;
@@ -61,7 +61,7 @@ const emailRules = [
     return "E-mail must be valid.";
   },
 ];
-const password = ref(import.meta.env.VITE_SUPABASE_PASSWORD);
+const password = ref("");
 const passwordRules = [
   (value: string) => {
     if (value) return true;
