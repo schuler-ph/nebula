@@ -5,8 +5,8 @@
       class="d-flex align-center justify-center flex-column"
     >
       <v-row class="d-flex align-center mb-4">
-        <v-btn @click="decreaseDate" icon="mdi-chevron-down"></v-btn>
-        <v-btn class="ma-5" elevation="10">
+        <v-btn @click="decreaseDate" icon="mdi-calendar-arrow-left"></v-btn>
+        <v-btn class="ma-5" elevation="10" size="large">
           <span v-if="date">{{ dateToIsoString(date[0]) }}</span>
           <v-menu
             v-model="datePickerMenu"
@@ -21,7 +21,7 @@
             ></v-date-picker
           ></v-menu>
         </v-btn>
-        <v-btn @click="increaseDate" icon="mdi-chevron-up"></v-btn
+        <v-btn @click="increaseDate" icon="mdi-calendar-arrow-right"></v-btn
       ></v-row>
       <v-text-field
         variant="solo-filled"
@@ -60,6 +60,7 @@ import { getUserId, supabase } from "@/lib/supabaseClient";
 import { VDatePicker } from "vuetify/lib/labs/components.mjs";
 import ContentInputCollection from "@/components/diary/ContentInputCollection.vue";
 import router from "@/router";
+import { dateToIsoString } from "@/helper/dateHelper";
 
 const datePickerMenu = ref(false);
 const date = ref([new Date()]);
@@ -101,22 +102,6 @@ async function submitInsert() {
       snackbarOpen.value = true;
     }
   }
-}
-
-function dateToIsoString(date1: Date) {
-  let str = "";
-  str += date1.getFullYear();
-  str += "-";
-  if ((date1.getMonth() as number) + 1 < 10) {
-    str += 0;
-  }
-  str += date1.getMonth() + 1;
-  str += "-";
-  if ((date1.getDate() as number) < 10) {
-    str += 0;
-  }
-  str += date1.getDate();
-  return str;
 }
 
 function decreaseDate() {

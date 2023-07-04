@@ -1,7 +1,7 @@
 <template>
   <v-container class="rounded-lg">
     <v-row>
-      <v-btn @click="$router.push('/new')" class="mx-auto my-5">
+      <v-btn size="large" @click="$router.push('/new')" class="mx-auto my-5">
         New entry
       </v-btn>
     </v-row>

@@ -5,7 +5,7 @@
       class="d-flex align-center justify-center flex-column"
     >
       <v-row class="mb-4">
-        <v-btn class="ma-5" elevation="10">
+        <v-btn class="ma-5" elevation="10" size="large">
           <span v-if="date">{{ day }}</span>
         </v-btn></v-row
       >

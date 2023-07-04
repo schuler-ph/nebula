@@ -1,6 +1,6 @@
 {
   "name": "nebula",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "scripts": {
     "dev": "vite",
     "types": "npx supabase gen types typescript --project-id \"nsysvbhfzbomwglmhzus\" --schema public > src/types/supabase.ts",
