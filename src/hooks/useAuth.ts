@@ -28,6 +28,7 @@ export default () => {
       password,
     });
     handleResponse(error);
+    return error;
   };
 
   const logout = async () => {

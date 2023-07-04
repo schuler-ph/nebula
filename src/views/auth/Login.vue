@@ -3,6 +3,7 @@
     v-if="!auth_loading"
     class="pa-6 d-flex flex-column align-center"
     min-width="350"
+    elevation="20"
   >
     <v-img :src="nebulaLogo" height="100"></v-img>
     <span class="text-h5 mb-10 mt-3"
@@ -33,13 +34,20 @@
 
     <v-card-actions>
       <v-btn
+        elevation="10"
         class="text-h6 font-weight-bold nebulaBgGradient px-5 d-flex"
         @click="submitLogin"
+        prepend-icon="mdi-login"
         >Login</v-btn
       >
     </v-card-actions>
   </v-card>
   <v-card v-else title="Loading..."> </v-card>
+  <CustomSnackbar
+    v-model="snackbarOpen"
+    :text="snackbarText"
+    :color="snackbarColor"
+  />
 </template>
 
 <script setup lang="ts">
@@ -48,6 +56,7 @@ import { storeToRefs } from "pinia";
 import { useAuthStore } from "@/store/authStore";
 import useAuth from "@/hooks/useAuth";
 import nebulaLogo from "@/assets/logo.svg";
+import CustomSnackbar from "@/components/generic/CustomSnackbar.vue";
 
 const valid = ref(false);
 const email = ref("");
@@ -72,9 +81,18 @@ const showPassword = ref(false);
 
 const { login } = useAuth();
 const { auth_loading } = storeToRefs(useAuthStore());
-function submitLogin() {
-  login(email.value, password.value);
+async function submitLogin() {
+  const error = await login(email.value, password.value);
+  if (error !== null) {
+    snackbarOpen.value = true;
+    snackbarText.value = "Invalid login credentials!";
+    snackbarColor.value = "deep-orange";
+  }
 }
+
+const snackbarOpen = ref(false);
+const snackbarText = ref("");
+const snackbarColor = ref("");
 </script>
 
 <style scoped>

@@ -36,6 +36,7 @@
       @update:content="(c) => (content = c)"
       @update:contentUni="(c) => (contentUni = c)"
       @update:contentTraining="(c) => (contentTraining = c)"
+      @update:contentProjects="(c) => (contentProjects = c)"
     />
 
     <v-sheet class="d-flex justify-center py-5" rounded="lg">
@@ -67,6 +68,7 @@ const title = ref("");
 const content = ref("");
 const contentUni = ref("");
 const contentTraining = ref("");
+const contentProjects = ref("");
 
 const snackbarOpen = ref(false);
 const snackbarText = ref("");
@@ -80,6 +82,7 @@ async function submitInsert() {
     content: content.value,
     content_training: contentTraining.value,
     content_uni: contentUni.value,
+    content_projects: contentProjects.value,
   };
 
   const { error } = await supabase.from("diary").insert(entry);
@@ -91,8 +94,12 @@ async function submitInsert() {
       snackbarText.value = "You already created an entry for this day!";
       snackbarColor.value = "red-darken-4";
       snackbarOpen.value = true;
+    } else {
+      console.log("INSERT ERROR", error);
+      snackbarText.value = "Unknown Error!";
+      snackbarColor.value = "red-darken-4";
+      snackbarOpen.value = true;
     }
-    console.log(error);
   }
 }
 

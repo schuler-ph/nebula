@@ -2,7 +2,7 @@
   <v-card
     elevation="3"
     :title="entry.day!"
-    :subtitle="entry.title! + ' (' + entry.content?.length + ')'"
+    :subtitle="entry.title! + ' (' + getFullContentLength() + ')'"
     class="ma-2 pa-2"
   >
     <v-card-actions>
@@ -83,5 +83,14 @@ const emit = defineEmits(["needRefresh"]);
 async function deleteThisEntry() {
   await supabase.from("diary").delete().eq("id", entry.id);
   emit("needRefresh");
+}
+
+function getFullContentLength() {
+  let len = 0;
+  len += entry.content?.length!;
+  len += entry.content_uni?.length!;
+  len += entry.content_training?.length!;
+  len += entry.content_projects?.length!;
+  return len;
 }
 </script>

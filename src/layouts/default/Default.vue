@@ -29,7 +29,9 @@
           <v-menu location="start" activator="parent">
             <v-list>
               <v-list-item>
-                <v-btn class="ma-3" @click="logout">logout</v-btn>
+                <v-btn append-icon="mdi-logout" class="ma-3" @click="logout"
+                  >logout</v-btn
+                >
               </v-list-item>
             </v-list>
           </v-menu>
@@ -38,22 +40,24 @@
     </v-app-bar>
 
     <v-main class="bg-deep-purple-lighten-5">
+      <v-toolbar
+        class="bg-white pl-6"
+        :border="true"
+        :class="smAndDown ? '' : 'd-none'"
+        title="Menu"
+        :collapse="xs"
+      >
+        <v-menu>
+          <template v-slot:activator="{ props }">
+            <v-btn v-bind="props" icon="mdi-menu"></v-btn>
+          </template>
+          <Sidebar />
+        </v-menu>
+      </v-toolbar>
       <v-container>
         <v-row>
           <v-col cols="2" :hidden="smAndDown">
-            <v-sheet rounded="lg" elevation="10">
-              <v-list rounded="lg">
-                <v-list-item v-for="n in 5" :key="n" link>
-                  <v-list-item-title> List Item {{ n }} </v-list-item-title>
-                </v-list-item>
-
-                <v-divider class="my-2"></v-divider>
-
-                <v-list-item link color="grey-lighten-4">
-                  <v-list-item-title> Refresh </v-list-item-title>
-                </v-list-item>
-              </v-list>
-            </v-sheet>
+            <Sidebar />
           </v-col>
 
           <v-col>
@@ -68,6 +72,7 @@
 </template>
 
 <script setup lang="ts">
+import Sidebar from "@/components/menu/Sidebar.vue";
 import { useDisplay } from "vuetify";
 const { smAndDown, xs } = useDisplay();
 

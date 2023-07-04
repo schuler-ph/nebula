@@ -8,6 +8,8 @@
         class="pa-2"
         variant="solo-filled"
         no-resize
+        counter
+        persistent-counter
       >
       </v-textarea>
     </v-sheet>
@@ -15,6 +17,6 @@
 </template>
 
 <script setup lang="ts">
-defineProps(["modelValue", "title", "color"]);
+const { modelValue } = defineProps(["modelValue", "title", "color"]);
 defineEmits(["update:modelValue"]);
 </script>
