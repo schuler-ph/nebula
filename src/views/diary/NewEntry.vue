@@ -4,8 +4,9 @@
       rounded="lg"
       class="d-flex align-center justify-center flex-column"
     >
-      <v-row>
-        <v-btn class="my-5" elevation="10">
+      <v-row class="d-flex align-center mb-4">
+        <v-btn @click="decreaseDate" icon="mdi-chevron-down"></v-btn>
+        <v-btn class="ma-5" elevation="10">
           <span v-if="date">{{ dateToIsoString(date[0]) }}</span>
           <v-menu
             v-model="datePickerMenu"
@@ -18,7 +19,9 @@
               @click:cancel="datePickerMenu = false"
               v-model="date"
             ></v-date-picker
-          ></v-menu> </v-btn
+          ></v-menu>
+        </v-btn>
+        <v-btn @click="increaseDate" icon="mdi-chevron-up"></v-btn
       ></v-row>
       <v-text-field
         variant="solo-filled"
@@ -29,56 +32,23 @@
       ></v-text-field>
     </v-container>
 
-    <v-row no-gutters>
-      <ContentInput
-        title="Content"
-        v-model.trim="content"
-        color="deep-purple-lighten-4"
-      />
-      <ContentInput
-        title="Uni"
-        v-model.trim="contentUni"
-        color="teal-lighten-4"
-        v-if="showContentUni"
-      />
-      <ContentInput
-        title="Training"
-        v-model.trim="contentTraining"
-        color="deep-orange-lighten-4"
-        v-if="showContentTraining"
-      />
+    <ContentInputCollection
+      @update:content="(c) => (content = c)"
+      @update:contentUni="(c) => (contentUni = c)"
+      @update:contentTraining="(c) => (contentTraining = c)"
+    />
 
-      <v-col cols="12" sm="4">
-        <v-sheet
-          min-height="100"
-          :border="true"
-          class="d-flex justify-center align-center ma-1"
-          rounded="lg"
-          height="100%"
-        >
-          <v-menu :close-on-content-click="false">
-            <template v-slot:activator="{ props }">
-              <v-btn v-bind="props" elevation="10" icon="mdi-plus"></v-btn>
-            </template>
-            <v-list>
-              <v-switch
-                v-model="showContentUni"
-                label="Uni"
-                color="teal-lighten-2"
-              ></v-switch>
-              <v-switch
-                v-model="showContentTraining"
-                label="Training"
-                color="deep-orange-lighten-2"
-              ></v-switch>
-            </v-list>
-          </v-menu>
-        </v-sheet>
-      </v-col>
-    </v-row>
-    <v-sheet class="d-flex justify-center mt-5">
+    <v-sheet class="d-flex justify-center py-5" rounded="lg">
       <v-btn @click="submitInsert">Submit</v-btn>
     </v-sheet>
+    <v-snackbar v-model="snackbarOpen" :color="snackbarColor">
+      {{ snackbarText }}
+      <template v-slot:actions>
+        <v-btn color="white" variant="text" @click="snackbarOpen = false">
+          Close
+        </v-btn>
+      </template>
+    </v-snackbar>
   </v-form>
 </template>
 
@@ -87,7 +57,7 @@ import { ref } from "vue";
 import { InsertDto } from "@/types/supabaseHelper";
 import { getUserId, supabase } from "@/lib/supabaseClient";
 import { VDatePicker } from "vuetify/lib/labs/components.mjs";
-import ContentInput from "@/components/diary/ContentInput.vue";
+import ContentInputCollection from "@/components/diary/ContentInputCollection.vue";
 import router from "@/router";
 
 const datePickerMenu = ref(false);
@@ -95,11 +65,12 @@ const date = ref([new Date()]);
 const title = ref("");
 
 const content = ref("");
-
 const contentUni = ref("");
-const showContentUni = ref(false);
 const contentTraining = ref("");
-const showContentTraining = ref(false);
+
+const snackbarOpen = ref(false);
+const snackbarText = ref("");
+const snackbarColor = ref("");
 
 async function submitInsert() {
   const entry: InsertDto<"diary"> = {
@@ -112,7 +83,17 @@ async function submitInsert() {
   };
 
   const { error } = await supabase.from("diary").insert(entry);
-  router.push({ name: "Home" });
+
+  if (error === null) {
+    router.push({ name: "Home" });
+  } else {
+    if (error.code === "23505") {
+      snackbarText.value = "You already created an entry for this day!";
+      snackbarColor.value = "red-darken-4";
+      snackbarOpen.value = true;
+    }
+    console.log(error);
+  }
 }
 
 function dateToIsoString(date1: Date) {
@@ -129,5 +110,21 @@ function dateToIsoString(date1: Date) {
   }
   str += date1.getDate();
   return str;
+}
+
+function decreaseDate() {
+  date.value[0] = new Date(
+    date.value[0].getFullYear(),
+    date.value[0].getMonth(),
+    date.value[0].getDate() - 1
+  );
+}
+
+function increaseDate() {
+  date.value[0] = new Date(
+    date.value[0].getFullYear(),
+    date.value[0].getMonth(),
+    date.value[0].getDate() + 1
+  );
 }
 </script>

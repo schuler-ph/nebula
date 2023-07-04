@@ -12,6 +12,7 @@ export interface Database {
       diary: {
         Row: {
           content: string | null
+          content_projects: string | null
           content_training: string | null
           content_uni: string | null
           day: string
@@ -22,6 +23,7 @@ export interface Database {
         }
         Insert: {
           content?: string | null
+          content_projects?: string | null
           content_training?: string | null
           content_uni?: string | null
           day: string
@@ -32,6 +34,7 @@ export interface Database {
         }
         Update: {
           content?: string | null
+          content_projects?: string | null
           content_training?: string | null
           content_uni?: string | null
           day?: string

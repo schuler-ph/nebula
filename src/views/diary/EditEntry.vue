@@ -4,8 +4,8 @@
       rounded="lg"
       class="d-flex align-center justify-center flex-column"
     >
-      <v-row>
-        <v-btn class="my-5" elevation="10">
+      <v-row class="mb-4">
+        <v-btn class="ma-5" elevation="10">
           <span v-if="date">{{ day }}</span>
         </v-btn></v-row
       >
@@ -18,54 +18,13 @@
       ></v-text-field>
     </v-container>
 
-    <v-row no-gutters>
-      <ContentInput
-        title="Content"
-        v-model.trim="content"
-        color="deep-purple-lighten-4"
-      />
-      <ContentInput
-        title="Uni"
-        v-model.trim="contentUni"
-        color="teal-lighten-4"
-        v-if="showContentUni"
-      />
-      <ContentInput
-        title="Training"
-        v-model.trim="contentTraining"
-        color="deep-orange-lighten-4"
-        v-if="showContentTraining"
-      />
+    <ContentInputCollection
+      @update:content="(c) => (content = c)"
+      @update:contentUni="(c) => (contentUni = c)"
+      @update:contentTraining="(c) => (contentTraining = c)"
+    />
 
-      <v-col cols="12" sm="4">
-        <v-sheet
-          min-height="100"
-          :border="true"
-          class="d-flex justify-center align-center ma-1"
-          rounded="lg"
-          height="100%"
-        >
-          <v-menu :close-on-content-click="false">
-            <template v-slot:activator="{ props }">
-              <v-btn v-bind="props" elevation="10" icon="mdi-plus"></v-btn>
-            </template>
-            <v-list>
-              <v-switch
-                v-model="showContentUni"
-                label="Uni"
-                color="teal-lighten-2"
-              ></v-switch>
-              <v-switch
-                v-model="showContentTraining"
-                label="Training"
-                color="deep-orange-lighten-2"
-              ></v-switch>
-            </v-list>
-          </v-menu>
-        </v-sheet>
-      </v-col>
-    </v-row>
-    <v-sheet class="d-flex justify-center mt-5">
+    <v-sheet class="d-flex justify-center py-5" rounded="lg">
       <v-btn class="mr-4" @click="submitUpdate">Submit</v-btn>
       <v-btn @click="$router.push({ name: 'Home' })">Cancel</v-btn>
     </v-sheet>
@@ -76,7 +35,7 @@
 import { ref } from "vue";
 import { UpdateDto } from "@/types/supabaseHelper";
 import { supabase } from "@/lib/supabaseClient";
-import ContentInput from "@/components/diary/ContentInput.vue";
+import ContentInputCollection from "@/components/diary/ContentInputCollection.vue";
 import router from "@/router";
 import { useRoute } from "vue-router";
 import { onMounted } from "vue";
@@ -85,9 +44,7 @@ const date = ref([]);
 const title = ref("");
 const content = ref("");
 const contentUni = ref("");
-const showContentUni = ref(false);
 const contentTraining = ref("");
-const showContentTraining = ref(false);
 
 const { day } = useRoute().params;
 
@@ -95,9 +52,6 @@ onMounted(async () => {
   const { data, error } = await supabase.from("diary").select().eq("day", day);
   if (error === null) {
     title.value = data[0].title!;
-    content.value = data[0].content!;
-    contentUni.value = data[0].content_uni!;
-    contentTraining.value = data[0].content_training!;
   }
 });
 
