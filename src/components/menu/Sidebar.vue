@@ -1,7 +1,7 @@
 <template>
   <v-sheet rounded="lg" elevation="10">
     <v-list rounded="lg">
-      <v-list-item v-for="link in links" :key="link.title" link :to="link.to">
+      <v-list-item v-for="link in links" :key="link.title" exact :to="link.to">
         <v-list-item-title> {{ link.title }} </v-list-item-title>
       </v-list-item>
 
@@ -25,8 +25,4 @@ const links = [
     to: "/new",
   },
 ];
-
-defineProps<{
-  inMenu: boolean;
-}>();
 </script>
