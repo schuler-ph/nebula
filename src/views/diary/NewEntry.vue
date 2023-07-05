@@ -5,7 +5,10 @@
       class="d-flex align-center justify-center flex-column"
     >
       <v-row class="d-flex align-center mb-4">
-        <v-btn @click="decreaseDate" icon="mdi-calendar-arrow-left"></v-btn>
+        <v-btn
+          @click="date[0] = new Date(date[0].setDate(date[0].getDate() - 1))"
+          icon="mdi-calendar-arrow-left"
+        ></v-btn>
         <v-btn class="ma-5" elevation="10" size="large">
           <span v-if="date">{{ dateToIsoString(date[0]) }}</span>
           <v-menu
@@ -21,7 +24,10 @@
             ></v-date-picker
           ></v-menu>
         </v-btn>
-        <v-btn @click="increaseDate" icon="mdi-calendar-arrow-right"></v-btn
+        <v-btn
+          @click="date[0] = new Date(date[0].setDate(date[0].getDate() + 1))"
+          icon="mdi-calendar-arrow-right"
+        ></v-btn
       ></v-row>
       <v-text-field
         variant="solo-filled"
@@ -42,14 +48,11 @@
     <v-sheet class="d-flex justify-center py-5" rounded="lg">
       <v-btn @click="submitInsert">Submit</v-btn>
     </v-sheet>
-    <v-snackbar v-model="snackbarOpen" :color="snackbarColor">
-      {{ snackbarText }}
-      <template v-slot:actions>
-        <v-btn color="white" variant="text" @click="snackbarOpen = false">
-          Close
-        </v-btn>
-      </template>
-    </v-snackbar>
+    <CustomSnackbar
+      v-model="snackbarOpen"
+      :text="snackbarText"
+      :color="snackbarColor"
+    />
   </v-form>
 </template>
 
@@ -62,18 +65,16 @@ import ContentInputCollection from "@/components/diary/ContentInputCollection.vu
 import router from "@/router";
 import { dateToIsoString } from "@/helper/dateHelper";
 
+import CustomSnackbar from "@/components/generic/CustomSnackbar.vue";
+import { useSnackbar } from "@/hooks/useSnackbar";
+import { useDiaryContent } from "@/hooks/useDiaryContent";
+const { snackbarOpen, snackbarText, snackbarColor, newSnackbarMessage } =
+  useSnackbar();
+
 const datePickerMenu = ref(false);
-const date = ref([new Date()]);
-const title = ref("");
 
-const content = ref("");
-const contentUni = ref("");
-const contentTraining = ref("");
-const contentProjects = ref("");
-
-const snackbarOpen = ref(false);
-const snackbarText = ref("");
-const snackbarColor = ref("");
+const { date, title, content, contentUni, contentTraining, contentProjects } =
+  useDiaryContent();
 
 async function submitInsert() {
   const entry: InsertDto<"diary"> = {
@@ -92,31 +93,11 @@ async function submitInsert() {
     router.push({ name: "Home" });
   } else {
     if (error.code === "23505") {
-      snackbarText.value = "You already created an entry for this day!";
-      snackbarColor.value = "red-darken-4";
-      snackbarOpen.value = true;
+      newSnackbarMessage("You already created an entry for this day!", "error");
     } else {
       console.log("INSERT ERROR", error);
-      snackbarText.value = "Unknown Error!";
-      snackbarColor.value = "red-darken-4";
-      snackbarOpen.value = true;
+      newSnackbarMessage("Unknown Error!", "error");
     }
   }
-}
-
-function decreaseDate() {
-  date.value[0] = new Date(
-    date.value[0].getFullYear(),
-    date.value[0].getMonth(),
-    date.value[0].getDate() - 1
-  );
-}
-
-function increaseDate() {
-  date.value[0] = new Date(
-    date.value[0].getFullYear(),
-    date.value[0].getMonth(),
-    date.value[0].getDate() + 1
-  );
 }
 </script>

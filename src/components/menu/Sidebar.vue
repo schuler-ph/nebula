@@ -66,9 +66,14 @@ const links = [
 ];
 const linksTraining = [
   {
-    title: "Split",
+    title: "Plan",
     to: "/training",
     icon: "mdi-hexagon-multiple",
+  },
+  {
+    title: "Split",
+    to: "/training/split",
+    icon: "mdi-hexagon",
   },
 ];
 </script>

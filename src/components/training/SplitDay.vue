@@ -6,13 +6,19 @@
     :color="color"
   >
     <v-btn
+      @click="$router.push('/edit/' + dateToIsoString(date))"
       :prepend-icon="icon"
       :color="
         dateToIsoString(date) === dateToIsoString(new Date())
-          ? 'deep-purple-darken-4'
+          ? 'white'
           : 'transparent'
       "
-      class="text-white text-h6 font-weight-black"
+      :class="
+        dateToIsoString(date) === dateToIsoString(new Date())
+          ? ''
+          : 'text-white'
+      "
+      class="text-h6 font-weight-black"
       >{{ title + " - " + dateToIsoString(date) }}</v-btn
     >
   </v-sheet>

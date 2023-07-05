@@ -57,6 +57,9 @@ import { useAuthStore } from "@/store/authStore";
 import useAuth from "@/hooks/useAuth";
 import nebulaLogo from "@/assets/logo.svg";
 import CustomSnackbar from "@/components/generic/CustomSnackbar.vue";
+import { useSnackbar } from "@/hooks/useSnackbar";
+const { snackbarOpen, snackbarText, snackbarColor, newSnackbarMessage } =
+  useSnackbar();
 
 const valid = ref(false);
 const email = ref("");
@@ -84,15 +87,9 @@ const { auth_loading } = storeToRefs(useAuthStore());
 async function submitLogin() {
   const error = await login(email.value, password.value);
   if (error !== null) {
-    snackbarOpen.value = true;
-    snackbarText.value = "Invalid login credentials!";
-    snackbarColor.value = "deep-orange";
+    newSnackbarMessage("Invalid login credentials!", "error");
   }
 }
-
-const snackbarOpen = ref(false);
-const snackbarText = ref("");
-const snackbarColor = ref("");
 </script>
 
 <style scoped>

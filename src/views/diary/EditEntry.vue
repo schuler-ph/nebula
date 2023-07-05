@@ -46,25 +46,27 @@ import CustomSnackbar from "@/components/generic/CustomSnackbar.vue";
 import router from "@/router";
 import { useRoute } from "vue-router";
 import { onMounted } from "vue";
+import { useSnackbar } from "@/hooks/useSnackbar";
+import { useDiaryContent } from "@/hooks/useDiaryContent";
 
-const date = ref([]);
-const title = ref("");
+const { date, title, content, contentUni, contentTraining, contentProjects } =
+  useDiaryContent();
 
-const content = ref("");
-const contentUni = ref("");
-const contentTraining = ref("");
-const contentProjects = ref("");
-
-const snackbarOpen = ref(false);
-const snackbarText = ref("");
-const snackbarColor = ref("");
+const { snackbarOpen, snackbarText, snackbarColor, newSnackbarMessage } =
+  useSnackbar();
 
 const { day } = useRoute().params;
 
 onMounted(async () => {
   const { data, error } = await supabase.from("diary").select().eq("day", day);
   if (error === null) {
-    title.value = data[0].title!;
+    if (data.length !== 0) {
+      title.value = data[0].title!;
+    } else {
+      newSnackbarMessage("This date does not exist!", "error");
+    }
+  } else {
+    newSnackbarMessage("Unknown Error!", "error");
   }
 });
 
@@ -84,14 +86,10 @@ async function submitUpdate() {
     router.push({ name: "Home" });
   } else {
     if (error.code === "23505") {
-      snackbarText.value = "You already created an entry for this day!";
-      snackbarColor.value = "red-darken-4";
-      snackbarOpen.value = true;
+      newSnackbarMessage("You already created an entry for this day!", "error");
     } else {
       console.log("UPDATE ERROR", error);
-      snackbarText.value = "Unknown Error!";
-      snackbarColor.value = "red-darken-4";
-      snackbarOpen.value = true;
+      newSnackbarMessage("Unknown Error!", "error");
     }
   }
 }

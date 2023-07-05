@@ -28,6 +28,11 @@ const routes = [
       },
       {
         path: "training",
+        name: "Plan",
+        component: () => import("@/views/training/Plan.vue"),
+      },
+      {
+        path: "training/split",
         name: "Split",
         component: () => import("@/views/training/Split.vue"),
       },

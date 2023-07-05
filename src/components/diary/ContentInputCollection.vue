@@ -69,6 +69,7 @@ import ContentInput from "./ContentInput.vue";
 import { onMounted } from "vue";
 import { supabase } from "@/lib/supabaseClient";
 import { useRoute } from "vue-router";
+import { useDiaryContent } from "@/hooks/useDiaryContent";
 
 const emit = defineEmits([
   "update:content",
@@ -85,7 +86,7 @@ onMounted(async () => {
       .from("diary")
       .select()
       .eq("day", day);
-    if (error === null) {
+    if (error === null && data.length !== 0) {
       content.value = data[0].content!;
       contentUni.value = data[0].content_uni!;
       contentTraining.value = data[0].content_training!;
@@ -101,12 +102,13 @@ onMounted(async () => {
   }
 });
 
-const content = ref("");
-const contentUni = ref("");
-const contentTraining = ref("");
-const contentProjects = ref("");
-
-const showContentUni = ref(false);
-const showContentTraining = ref(false);
-const showContentProjects = ref(false);
+const {
+  content,
+  contentUni,
+  contentTraining,
+  contentProjects,
+  showContentUni,
+  showContentTraining,
+  showContentProjects,
+} = useDiaryContent();
 </script>
