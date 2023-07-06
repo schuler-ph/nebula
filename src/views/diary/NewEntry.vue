@@ -96,7 +96,7 @@ async function submitInsert() {
       newSnackbarMessage("You already created an entry for this day!", "error");
     } else {
       console.log("INSERT ERROR", error);
-      newSnackbarMessage("Unknown Error!", "error");
+      newSnackbarMessage(error.message, "error");
     }
   }
 }

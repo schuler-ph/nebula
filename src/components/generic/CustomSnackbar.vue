@@ -14,6 +14,6 @@
 </template>
 
 <script setup lang="ts">
-const { modelValue } = defineProps(["modelValue", "text", "color"]);
+defineProps(["modelValue", "text", "color"]);
 defineEmits(["update:modelValue"]);
 </script>

@@ -26,43 +26,22 @@
             Edit
           </v-btn>
 
-          <v-dialog v-model="deleteDialog" width="auto">
-            <template v-slot:activator="{ props }">
-              <v-btn
-                variant="tonal"
-                color="red"
-                class="mt-1 mb-2 mx-2"
-                v-bind="props"
-              >
-                Delete
-              </v-btn>
+          <CustomDialog
+            :action="deleteThisEntry"
+            color="red"
+            class="mt-1 mb-2 mx-2"
+          >
+            <template v-slot:text> Delete </template>
+            <template v-slot:content>
+              Are you sure you want to delete this diary entry?
+              <br />
+              Its content is
+              <span class="font-weight-black">{{
+                getFullContentLength()
+              }}</span>
+              characters long!
             </template>
-
-            <v-card>
-              <v-card-text>
-                Are you sure you want to delete this diary entry?
-                <br />
-                Its content is
-                <span class="font-weight-black">{{
-                  entry.content?.length
-                }}</span>
-                characters long!
-              </v-card-text>
-              <v-card-actions>
-                <v-sheet class="d-flex">
-                  <v-btn variant="tonal" color="red" @click="deleteThisEntry"
-                    >Confirm</v-btn
-                  >
-                  <v-btn
-                    variant="tonal"
-                    color="primary"
-                    @click="deleteDialog = false"
-                    >Cancel</v-btn
-                  >
-                </v-sheet>
-              </v-card-actions>
-            </v-card>
-          </v-dialog>
+          </CustomDialog>
         </v-card>
       </v-menu>
     </v-card-actions>
@@ -73,12 +52,12 @@
 import { supabase } from "@/lib/supabaseClient";
 import { Row } from "@/types/supabaseHelper";
 import { ref } from "vue";
+import CustomDialog from "../generic/CustomDialog.vue";
 
 const { entry } = defineProps<{
   entry: Row<"diary">;
 }>();
 
-const deleteDialog = ref(false);
 const emit = defineEmits(["needRefresh"]);
 async function deleteThisEntry() {
   await supabase.from("diary").delete().eq("id", entry.id);
@@ -87,6 +66,7 @@ async function deleteThisEntry() {
 
 function getFullContentLength() {
   let len = 0;
+  len += entry.title?.length!;
   len += entry.content?.length!;
   len += entry.content_uni?.length!;
   len += entry.content_training?.length!;
