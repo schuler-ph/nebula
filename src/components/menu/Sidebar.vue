@@ -75,6 +75,11 @@ const linksTraining = [
     to: "/training/split",
     icon: "mdi-hexagon",
   },
+  {
+    title: "Exercises",
+    to: "/training/exercises",
+    icon: "mdi-star-three-points",
+  },
 ];
 </script>
 
