@@ -22,7 +22,7 @@ import DiaryEntry from "@/components/diary/DiaryEntry.vue";
 const diaryEntries = ref<Row<"diary">[] | null>([]);
 
 async function getEntries() {
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from("diary")
     .select()
     .order("day", { ascending: false });

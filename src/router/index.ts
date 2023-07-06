@@ -37,6 +37,11 @@ const routes = [
         component: () => import("@/views/training/Split.vue"),
       },
       {
+        path: "training/exercises",
+        name: "Exercises",
+        component: () => import("@/views/training/Exercises.vue"),
+      },
+      {
         path: "about",
         name: "About",
         component: () => import("@/views/About.vue"),
@@ -51,6 +56,17 @@ const routes = [
         path: "",
         name: "Login",
         component: () => import("@/views/auth/Login.vue"),
+      },
+    ],
+  },
+  {
+    path: "/:pathMatch(.*)*",
+    component: () => import("@/layouts/auth/Default.vue"),
+    children: [
+      {
+        path: "",
+        name: "NotFound",
+        component: () => import("@/views/NotFound.vue"),
       },
     ],
   },
