@@ -25,6 +25,8 @@
       @update:contentProjects="(c) => (contentProjects = c)"
     />
 
+    <TodoCollection @update:todoDaily="(t) => (todoDaily = t)" />
+
     <v-sheet class="d-flex justify-center py-5" rounded="lg">
       <v-btn class="mr-4" @click="submitUpdate">Submit</v-btn>
       <v-btn @click="cancelUpdate">Cancel</v-btn>
@@ -69,13 +71,20 @@ import { useRoute } from "vue-router";
 import { onMounted } from "vue";
 import { useSnackbar } from "@/hooks/useSnackbar";
 import { useDiaryContent } from "@/hooks/useDiaryContent";
-import CustomDialog from "@/components/generic/CustomDialog.vue";
+import TodoCollection from "@/components/diary/TodoCollection.vue";
 
 const { day } = useRoute().params;
 let oldEntry: UpdateDto<"diary">;
 const modifiedTime = new Date().toUTCString();
-const { date, title, content, contentUni, contentTraining, contentProjects } =
-  useDiaryContent();
+const {
+  date,
+  title,
+  content,
+  contentUni,
+  contentTraining,
+  contentProjects,
+  todoDaily,
+} = useDiaryContent();
 const { snackbarOpen, snackbarText, snackbarColor, newSnackbarMessage } =
   useSnackbar();
 const cancelDialog = ref(false);
@@ -87,11 +96,12 @@ onMounted(async () => {
       title.value = data[0].title!;
 
       oldEntry = {
-        title: data[0].title!,
-        content: data[0].content!,
-        content_training: data[0].content_training!,
-        content_uni: data[0].content_uni!,
-        content_projects: data[0].content_projects!,
+        title: data[0].title,
+        content: data[0].content,
+        content_training: data[0].content_training,
+        content_uni: data[0].content_uni,
+        content_projects: data[0].content_projects,
+        todoDailyDone: data[0].todoDailyDone,
         last_modified: modifiedTime,
       };
     } else {
@@ -114,6 +124,7 @@ function currentEntry() {
     content_training: contentTraining.value,
     content_uni: contentUni.value,
     content_projects: contentProjects.value,
+    todoDailyDone: todoDaily.value,
     last_modified: modifiedTime,
   } as UpdateDto<"diary">;
 }

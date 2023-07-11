@@ -12,6 +12,11 @@ export function useDiaryContent() {
   const showContentTraining = ref(false);
   const showContentProjects = ref(false);
 
+  const todoDaily = ref<string[]>([]);
+  const todoTraining = ref({});
+
+  const showTodoTraining = ref(false);
+
   return {
     date,
     title,
@@ -22,5 +27,8 @@ export function useDiaryContent() {
     showContentUni,
     showContentTraining,
     showContentProjects,
+    todoDaily,
+    todoTraining,
+    showTodoTraining,
   };
 }

@@ -38,12 +38,12 @@
       ></v-text-field>
     </v-container>
 
-    <ContentInputCollection
+    <!-- <ContentInputCollection
       @update:content="(c) => (content = c)"
       @update:contentUni="(c) => (contentUni = c)"
       @update:contentTraining="(c) => (contentTraining = c)"
       @update:contentProjects="(c) => (contentProjects = c)"
-    />
+    /> -->
 
     <v-sheet class="d-flex justify-center py-5" rounded="lg">
       <v-btn @click="submitInsert">Submit</v-btn>

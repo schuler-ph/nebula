@@ -19,6 +19,7 @@ export interface Database {
           id: string
           last_modified: string | null
           title: string | null
+          todoDailyDone: string[]
           user_id: string
         }
         Insert: {
@@ -30,6 +31,7 @@ export interface Database {
           id?: string
           last_modified?: string | null
           title?: string | null
+          todoDailyDone?: string[]
           user_id: string
         }
         Update: {
@@ -41,6 +43,7 @@ export interface Database {
           id?: string
           last_modified?: string | null
           title?: string | null
+          todoDailyDone?: string[]
           user_id?: string
         }
         Relationships: [
@@ -93,16 +96,26 @@ export interface Database {
         Row: {
           id: number
           name: string
+          user_id: string | null
         }
         Insert: {
           id?: number
           name: string
+          user_id?: string | null
         }
         Update: {
           id?: number
           name?: string
+          user_id?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "exerciseCategory_user_id_fkey"
+            columns: ["user_id"]
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
       }
       split: {
         Row: {
@@ -132,6 +145,43 @@ export interface Database {
         Relationships: [
           {
             foreignKeyName: "split_user_id_fkey"
+            columns: ["user_id"]
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      todo: {
+        Row: {
+          category: string
+          id: string
+          name: string
+          subtodo_of: string | null
+          user_id: string
+        }
+        Insert: {
+          category: string
+          id?: string
+          name: string
+          subtodo_of?: string | null
+          user_id: string
+        }
+        Update: {
+          category?: string
+          id?: string
+          name?: string
+          subtodo_of?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "todo_subtodo_of_fkey"
+            columns: ["subtodo_of"]
+            referencedRelation: "todo"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "todo_user_id_fkey"
             columns: ["user_id"]
             referencedRelation: "users"
             referencedColumns: ["id"]

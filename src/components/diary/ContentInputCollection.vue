@@ -2,27 +2,27 @@
   <v-row no-gutters>
     <ContentInput
       title="Content"
-      v-model.trim="content"
+      v-model="content"
       color="deep-purple-lighten-4"
       @update:modelValue="$emit('update:content', content)"
     />
     <ContentInput
       title="Uni"
-      v-model.trim="contentUni"
+      v-model="contentUni"
       color="teal-lighten-4"
       v-if="showContentUni"
       @update:modelValue="$emit('update:contentUni', contentUni)"
     />
     <ContentInput
       title="Training"
-      v-model.trim="contentTraining"
+      v-model="contentTraining"
       color="deep-orange-lighten-4"
       v-if="showContentTraining"
       @update:modelValue="$emit('update:contentTraining', contentTraining)"
     />
     <ContentInput
       title="Projekte"
-      v-model.trim="contentProjects"
+      v-model="contentProjects"
       color="light-green-lighten-4"
       v-if="showContentProjects"
       @update:modelValue="$emit('update:contentProjects', contentProjects)"

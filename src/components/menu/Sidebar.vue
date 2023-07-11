@@ -24,6 +24,18 @@
 
       <v-divider class="my-2"></v-divider>
 
+      <v-list-item
+        v-for="link in linksTodo"
+        :key="link.title"
+        exact
+        :to="link.to"
+        :prepend-icon="link.icon"
+      >
+        <v-list-item-title> {{ link.title }} </v-list-item-title>
+      </v-list-item>
+
+      <v-divider class="my-2"></v-divider>
+
       <v-menu location="start">
         <template v-slot:activator="{ props }">
           <v-list-item
@@ -79,6 +91,19 @@ const linksTraining = [
     title: "Exercises",
     to: "/training/exercises",
     icon: "mdi-star-three-points",
+  },
+];
+
+const linksTodo = [
+  {
+    title: "Todos",
+    to: "/todo",
+    icon: "mdi-clipboard-list",
+  },
+  {
+    title: "Todo Daily",
+    to: "/todo/daily",
+    icon: "mdi-clipboard-clock",
   },
 ];
 </script>

@@ -42,6 +42,16 @@ const routes = [
         component: () => import("@/views/training/Exercises.vue"),
       },
       {
+        path: "todo",
+        name: "Todos",
+        component: () => import("@/views/diary/todo/Main.vue"),
+      },
+      {
+        path: "todo/daily",
+        name: "TodoDailyTemplate",
+        component: () => import("@/views/diary/todo/TodoDailyTemplate.vue"),
+      },
+      {
         path: "about",
         name: "About",
         component: () => import("@/views/About.vue"),
