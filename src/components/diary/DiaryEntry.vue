@@ -30,8 +30,9 @@
             :action="deleteThisEntry"
             color="red"
             class="mt-1 mb-2 mx-2"
+            text="Delete"
+            variant="tonal"
           >
-            <template v-slot:text> Delete </template>
             <template v-slot:content>
               Are you sure you want to delete this diary entry?
               <br />

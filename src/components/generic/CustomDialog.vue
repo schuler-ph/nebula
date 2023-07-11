@@ -2,14 +2,23 @@
   <v-dialog v-model="dialogOpen" width="auto">
     <template v-slot:activator="{ props }">
       <v-btn
-        @click="checkInstant"
-        variant="tonal"
+        v-if="!text"
+        :variant="variant"
         :color="color"
         :class="class"
         v-bind="props"
+        :icon="icon"
+        :size="size"
+      />
+      <v-btn
+        v-else
+        :variant="variant"
+        :color="color"
+        :class="class"
+        v-bind="props"
+        :size="size"
+        >{{ text }}</v-btn
       >
-        <slot name="text"></slot>
-      </v-btn>
     </template>
 
     <v-card>
@@ -28,18 +37,18 @@
 
 <script setup lang="ts">
 import { ref } from "vue";
-const { action, closeInstant } = defineProps([
+const { action } = defineProps([
   "action",
   "color",
   "class",
-  "closeInstant",
+  "text",
+  "icon",
+  "size",
+  "variant",
 ]);
 const dialogOpen = ref(false);
 function doit() {
   dialogOpen.value = false;
   action();
-}
-function checkInstant() {
-  console.log(closeInstant);
 }
 </script>

@@ -3,17 +3,13 @@
     <v-expansion-panels :class="'bg-' + color" class="pa-3 rounded-lg">
       <v-expansion-panel v-for="todo in template">
         <v-expansion-panel-title>
-          <v-sheet width="30%">
-            <v-checkbox-btn
-              :value="todo.id"
-              :label="capFirst(todo.name)"
-              :model-value="modelValue"
-              @click.native="check($event)"
-              @update:model-value="
-                (newVal) => $emit('update:modelValue', newVal)
-              "
-            ></v-checkbox-btn>
-          </v-sheet>
+          <v-checkbox-btn
+            :value="todo.id"
+            :label="capFirst(todo.name)"
+            :model-value="modelValue"
+            @click.native="check($event)"
+            @update:model-value="(newVal) => $emit('update:modelValue', newVal)"
+          ></v-checkbox-btn>
         </v-expansion-panel-title>
         <v-expansion-panel-text>
           <v-sheet v-for="sub in todo.subtodos">
