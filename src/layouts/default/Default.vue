@@ -42,7 +42,7 @@
       </v-toolbar> -->
       <v-container>
         <v-row>
-          <v-col :cols="md ? 4 : 3" :hidden="smAndDown">
+          <v-col :cols="md ? 4 : 3" :hidden="smAndDown" class="fixed">
             <Sidebar />
           </v-col>
 

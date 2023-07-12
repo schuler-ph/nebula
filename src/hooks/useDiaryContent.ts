@@ -17,7 +17,8 @@ export function useDiaryContent() {
 
   const showTodoTraining = ref(false);
 
-  const currentWeight = ref(0.0);
+  const currentWeight = ref<number | null>(0.0);
+  const weightSlider = ref(0.0);
 
   return {
     date,
@@ -33,5 +34,6 @@ export function useDiaryContent() {
     todoTraining,
     showTodoTraining,
     currentWeight,
+    weightSlider,
   };
 }

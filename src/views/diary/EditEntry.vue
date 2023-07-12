@@ -30,12 +30,38 @@
     <v-sheet class="d-flex justify-center ma-5">
       <v-card :width="smAndUp ? '50%' : '100%'" class="pa-3" elevation="10">
         <v-text-field
-          v-model="currentWeight"
+          :width="smAndUp ? '50%' : '100%'"
+          v-model.number="currentWeight"
           label="Aktuelles Gewicht"
           type="number"
           step="0.1"
-        /> </v-card
-    ></v-sheet>
+          @update:model-value="(a) => centerSlider(a)"
+        >
+          <template v-slot:append
+            ><v-btn @click="getLatestWeight" icon="mdi-history"></v-btn
+          ></template>
+        </v-text-field>
+        <v-slider
+          class="mt-5"
+          :min="currentWeight - 2"
+          :max="currentWeight + 2"
+          thumb-label="always"
+          step="0.1"
+          v-if="currentWeight"
+          v-model.number="weightSlider"
+          @end="
+            (a) => {
+              currentWeight = Number(weightSlider.toFixed(1));
+              centerSlider(String(a));
+            }
+          "
+        >
+          <template v-slot:thumb-label>
+            {{ weightSlider.toFixed(1) }}
+          </template>
+        </v-slider>
+      </v-card>
+    </v-sheet>
 
     <v-sheet class="d-flex justify-center py-5" rounded="lg">
       <v-btn class="mr-4" @click="submitUpdate">Submit</v-btn>
@@ -86,7 +112,6 @@ import { useDisplay } from "vuetify";
 const { smAndUp } = useDisplay();
 
 const { day } = useRoute().params;
-let oldEntry: UpdateDto<"diary">;
 const modifiedTime = new Date().toUTCString();
 const {
   date,
@@ -97,10 +122,12 @@ const {
   contentProjects,
   todoDaily,
   currentWeight,
+  weightSlider,
 } = useDiaryContent();
 const { snackbarOpen, snackbarText, snackbarColor, newSnackbarMessage } =
   useSnackbar();
 const cancelDialog = ref(false);
+let oldEntry: UpdateDto<"diary">;
 
 onMounted(async () => {
   const { data, error } = await supabase.from("diary").select().eq("day", day);
@@ -108,6 +135,10 @@ onMounted(async () => {
     if (data.length !== 0) {
       title.value = data[0].title!;
       currentWeight.value = data[0].currentWeight!;
+
+      if (currentWeight.value) {
+        weightSlider.value = currentWeight.value;
+      }
 
       oldEntry = {
         title: data[0].title,
@@ -173,6 +204,28 @@ function cancelUpdate() {
     cancelDialog.value = true;
   } else {
     router.push({ name: "Home" });
+  }
+}
+
+async function getLatestWeight() {
+  const { data, error } = await supabase
+    .from("diary")
+    .select("currentWeight")
+    .not("currentWeight", "is", null)
+    .order("day", { ascending: false })
+    .limit(1);
+
+  if (error === null && data.length !== 0) {
+    currentWeight.value = data[0].currentWeight!;
+    centerSlider("force");
+  }
+}
+
+function centerSlider(a: string) {
+  if (a === "") {
+    currentWeight.value = null;
+  } else {
+    weightSlider.value = currentWeight.value!;
   }
 }
 </script>
