@@ -15,6 +15,7 @@ export interface Database {
           content_projects: string | null
           content_training: string | null
           content_uni: string | null
+          currentWeight: number | null
           day: string
           id: string
           last_modified: string | null
@@ -27,6 +28,7 @@ export interface Database {
           content_projects?: string | null
           content_training?: string | null
           content_uni?: string | null
+          currentWeight?: number | null
           day: string
           id?: string
           last_modified?: string | null
@@ -39,6 +41,7 @@ export interface Database {
           content_projects?: string | null
           content_training?: string | null
           content_uni?: string | null
+          currentWeight?: number | null
           day?: string
           id?: string
           last_modified?: string | null

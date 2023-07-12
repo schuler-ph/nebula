@@ -27,6 +27,16 @@
 
     <TodoCollection @update:todoDaily="(t) => (todoDaily = t)" />
 
+    <v-sheet class="d-flex justify-center ma-5">
+      <v-card :width="smAndUp ? '50%' : '100%'" class="pa-3" elevation="10">
+        <v-text-field
+          v-model="currentWeight"
+          label="Aktuelles Gewicht"
+          type="number"
+          step="0.1"
+        /> </v-card
+    ></v-sheet>
+
     <v-sheet class="d-flex justify-center py-5" rounded="lg">
       <v-btn class="mr-4" @click="submitUpdate">Submit</v-btn>
       <v-btn @click="cancelUpdate">Cancel</v-btn>
@@ -72,6 +82,8 @@ import { onMounted } from "vue";
 import { useSnackbar } from "@/hooks/useSnackbar";
 import { useDiaryContent } from "@/hooks/useDiaryContent";
 import TodoCollection from "@/components/diary/TodoCollection.vue";
+import { useDisplay } from "vuetify";
+const { smAndUp } = useDisplay();
 
 const { day } = useRoute().params;
 let oldEntry: UpdateDto<"diary">;
@@ -84,6 +96,7 @@ const {
   contentTraining,
   contentProjects,
   todoDaily,
+  currentWeight,
 } = useDiaryContent();
 const { snackbarOpen, snackbarText, snackbarColor, newSnackbarMessage } =
   useSnackbar();
@@ -94,6 +107,7 @@ onMounted(async () => {
   if (error === null) {
     if (data.length !== 0) {
       title.value = data[0].title!;
+      currentWeight.value = data[0].currentWeight!;
 
       oldEntry = {
         title: data[0].title,
@@ -102,6 +116,7 @@ onMounted(async () => {
         content_uni: data[0].content_uni,
         content_projects: data[0].content_projects,
         todoDailyDone: data[0].todoDailyDone,
+        currentWeight: data[0].currentWeight,
         last_modified: modifiedTime,
       };
     } else {
@@ -125,6 +140,7 @@ function currentEntry() {
     content_uni: contentUni.value,
     content_projects: contentProjects.value,
     todoDailyDone: todoDaily.value,
+    currentWeight: currentWeight.value,
     last_modified: modifiedTime,
   } as UpdateDto<"diary">;
 }

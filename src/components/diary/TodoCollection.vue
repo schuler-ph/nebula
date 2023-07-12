@@ -26,8 +26,9 @@ onMounted(async () => {
     .eq("day", day);
   if (error === null && data.length !== 0) {
     todoDaily.value = data[0].todoDailyDone;
+    emit("update:todoDaily", todoDaily.value);
   }
 });
 
-defineEmits(["update:todoDaily"]);
+const emit = defineEmits(["update:todoDaily"]);
 </script>

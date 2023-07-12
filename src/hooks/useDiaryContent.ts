@@ -17,6 +17,8 @@ export function useDiaryContent() {
 
   const showTodoTraining = ref(false);
 
+  const currentWeight = ref(0.0);
+
   return {
     date,
     title,
@@ -30,5 +32,6 @@ export function useDiaryContent() {
     todoDaily,
     todoTraining,
     showTodoTraining,
+    currentWeight,
   };
 }
