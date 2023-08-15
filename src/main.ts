@@ -12,6 +12,8 @@ import { createApp } from "vue";
 
 // Plugins
 import { registerPlugins } from "@/plugins";
+import { getWeekFunctions } from "./helper/dateHelper";
+getWeekFunctions();
 
 const app = createApp(App);
 

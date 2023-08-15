@@ -75,6 +75,11 @@ const links = [
     to: "/new",
     icon: "mdi-calendar-plus",
   },
+  {
+    title: "Week closure",
+    to: "/weekclosure",
+    icon: "mdi-calendar-week",
+  },
 ];
 const linksTraining = [
   {

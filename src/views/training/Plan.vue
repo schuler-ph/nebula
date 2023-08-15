@@ -29,11 +29,7 @@
 <script setup lang="ts">
 import SplitDay from "@/components/training/SplitDay.vue";
 import { ref } from "vue";
-
-function getDayOfCurrentWeek(day: number) {
-  var curr = new Date();
-  return new Date(curr.setDate(curr.getDate() - (curr.getDay() - day)));
-}
+import { getDayOfCurrentWeek } from "@/helper/dateHelper";
 
 const weekdays = ref([
   {

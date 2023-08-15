@@ -22,6 +22,7 @@ export interface Database {
           title: string | null
           todoDailyDone: string[]
           user_id: string
+          week_closure: string | null
         }
         Insert: {
           content?: string | null
@@ -35,6 +36,7 @@ export interface Database {
           title?: string | null
           todoDailyDone?: string[]
           user_id: string
+          week_closure?: string | null
         }
         Update: {
           content?: string | null
@@ -48,6 +50,7 @@ export interface Database {
           title?: string | null
           todoDailyDone?: string[]
           user_id?: string
+          week_closure?: string | null
         }
         Relationships: [
           {
