@@ -160,21 +160,27 @@ export interface Database {
       todo: {
         Row: {
           category: string
+          done: boolean
           id: string
+          inactive: boolean
           name: string
           subtodo_of: string | null
           user_id: string
         }
         Insert: {
           category: string
+          done?: boolean
           id?: string
+          inactive?: boolean
           name: string
           subtodo_of?: string | null
           user_id: string
         }
         Update: {
           category?: string
+          done?: boolean
           id?: string
+          inactive?: boolean
           name?: string
           subtodo_of?: string | null
           user_id?: string

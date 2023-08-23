@@ -6,10 +6,10 @@
       <v-expansion-panel v-for="todo in template">
         <v-expansion-panel-title class="text-h5">
           <CustomDialog
-            :action="() => deleteTodo(todo.id)"
-            color="primary"
+            :action="() => disableTodo(todo.id)"
+            :color="todo.inactive ? 'secondary' : 'primary'"
             class="mr-5 text-h6"
-            icon="mdi-trash-can-outline"
+            :icon="todo.inactive ? 'mdi-delete-restore' : 'mdi-delete'"
             size="small"
           >
             <template v-slot:content>
@@ -21,14 +21,14 @@
         <v-expansion-panel-text>
           <v-sheet class="my-2" v-for="sub in todo.subtodos">
             <CustomDialog
-              :action="() => deleteTodo(sub.id)"
-              color="primary"
+              :action="() => disableTodo(sub.id)"
+              :color="sub.inactive ? 'secondary' : 'primary'"
               class="mx-5"
-              icon="mdi-trash-can-outline"
+              :icon="sub.inactive ? 'mdi-delete-restore' : 'mdi-delete'"
               size="x-small"
             >
               <template v-slot:content>
-                Are you sure you want to delete this todo and all subtodos?
+                Are you sure you want to delete this subtodo?
               </template>
             </CustomDialog>
             {{ capFirst(sub.name) }}
@@ -68,19 +68,12 @@ async function getTodoTemplate() {
     .order("name", { ascending: true });
   if (error === null && data.length !== 0) {
     todos = data.filter((d) => d.subtodo_of === null);
-    todos.forEach(async (t) => {
-      const { data, error } = await supabase
-        .from("todo")
-        .select()
-        .eq("subtodo_of", t.id);
-      if (error === null && data.length !== 0) {
-        template.value.push({
-          ...t,
-          subtodos: data,
-        });
-      } else {
-        template.value.push(t);
-      }
+    todos.forEach((t) => {
+      const subtodos = data.filter((d) => d.subtodo_of === t.id);
+      template.value.push({
+        ...t,
+        subtodos,
+      });
     });
   }
 }
@@ -99,8 +92,11 @@ async function addNewTodo(parent?: string) {
   }
 }
 
-async function deleteTodo(id: string) {
-  const { error } = await supabase.from("todo").delete().eq("id", id);
+async function disableTodo(id: string) {
+  const { error } = await supabase
+    .from("todo")
+    .update({ inactive: true })
+    .eq("id", id);
   if (error === null) {
     await getTodoTemplate();
   }

@@ -3,13 +3,19 @@
     <v-expansion-panels :class="'bg-' + color" class="pa-3 rounded-lg">
       <v-expansion-panel v-for="todo in template">
         <v-expansion-panel-title>
-          <v-checkbox-btn
-            :value="todo.id"
-            :label="capFirst(todo.name)"
-            :model-value="modelValue"
-            @click.native="check($event)"
-            @update:model-value="(newVal) => $emit('update:modelValue', newVal)"
-          ></v-checkbox-btn>
+          <v-sheet class="d-flex align-center">
+            <v-checkbox-btn
+              :value="todo.id"
+              :model-value="modelValue"
+              @click.native="check($event)"
+              @update:model-value="
+                (newVal) => $emit('update:modelValue', newVal)
+              "
+            ></v-checkbox-btn>
+            <h3 class="font-weight-regular">
+              {{ capFirst(todo.name) }}
+            </h3></v-sheet
+          >
         </v-expansion-panel-title>
         <v-expansion-panel-text>
           <v-sheet v-for="sub in todo.subtodos">
@@ -54,23 +60,17 @@ async function getTodoTemplate() {
   const { data, error } = await supabase
     .from("todo")
     .select()
-    .eq("category", category)
+    .not("inactive", "eq", true)
+    .eq("category", "daily")
     .order("name", { ascending: true });
   if (error === null && data.length !== 0) {
     todos = data.filter((d) => d.subtodo_of === null);
-    todos.forEach(async (t) => {
-      const { data, error } = await supabase
-        .from("todo")
-        .select()
-        .eq("subtodo_of", t.id);
-      if (error === null && data.length !== 0) {
-        template.value.push({
-          ...t,
-          subtodos: data,
-        });
-      } else {
-        template.value.push(t);
-      }
+    todos.forEach((t) => {
+      const subtodos = data.filter((d) => d.subtodo_of === t.id);
+      template.value.push({
+        ...t,
+        subtodos,
+      });
     });
   }
 }

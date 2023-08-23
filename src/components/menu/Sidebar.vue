@@ -101,14 +101,14 @@ const linksTraining = [
 
 const linksTodo = [
   {
-    title: "Todos",
-    to: "/todo",
-    icon: "mdi-clipboard-list",
-  },
-  {
     title: "Todo Daily",
     to: "/todo/daily",
-    icon: "mdi-clipboard-clock",
+    icon: "mdi-clipboard-check",
+  },
+  {
+    title: "Todo Longterm",
+    to: "/todo/longterm",
+    icon: "mdi-clipboard-text-clock",
   },
 ];
 </script>

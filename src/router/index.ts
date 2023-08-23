@@ -47,14 +47,14 @@ const routes = [
         component: () => import("@/views/training/Exercises.vue"),
       },
       {
-        path: "todo",
-        name: "Todos",
-        component: () => import("@/views/diary/todo/Main.vue"),
+        path: "todo/daily",
+        name: "TodoDaily",
+        component: () => import("@/views/diary/todo/TodoDaily.vue"),
       },
       {
-        path: "todo/daily",
-        name: "TodoDailyTemplate",
-        component: () => import("@/views/diary/todo/TodoDailyTemplate.vue"),
+        path: "todo/longterm",
+        name: "TodoLongterm",
+        component: () => import("@/views/diary/todo/TodoLongterm.vue"),
       },
       {
         path: "about",
