@@ -6,14 +6,15 @@
       <v-expansion-panel v-for="todo in template">
         <v-expansion-panel-title class="text-h5">
           <CustomDialog
-            :action="() => disableTodo(todo.id)"
+            :action="() => disableTodo(todo.id, todo.inactive)"
             :color="todo.inactive ? 'secondary' : 'primary'"
             class="mr-5 text-h6"
             :icon="todo.inactive ? 'mdi-delete-restore' : 'mdi-delete'"
             size="small"
           >
             <template v-slot:content>
-              Are you sure you want to delete this todo and all subtodos?
+              Are you sure you want to
+              {{ todo.inactive ? "enable" : "disable" }} this todo?
             </template>
           </CustomDialog>
           {{ capFirst(todo.name) }}
@@ -21,14 +22,15 @@
         <v-expansion-panel-text>
           <v-sheet class="my-2" v-for="sub in todo.subtodos">
             <CustomDialog
-              :action="() => disableTodo(sub.id)"
+              :action="() => disableTodo(sub.id, sub.inactive)"
               :color="sub.inactive ? 'secondary' : 'primary'"
               class="mx-5"
               :icon="sub.inactive ? 'mdi-delete-restore' : 'mdi-delete'"
               size="x-small"
             >
               <template v-slot:content>
-                Are you sure you want to delete this subtodo?
+                Are you sure you want to
+                {{ sub.inactive ? "enable" : "disable" }} this subtodo?
               </template>
             </CustomDialog>
             {{ capFirst(sub.name) }}
@@ -92,10 +94,10 @@ async function addNewTodo(parent?: string) {
   }
 }
 
-async function disableTodo(id: string) {
+async function disableTodo(id: string, status: boolean) {
   const { error } = await supabase
     .from("todo")
-    .update({ inactive: true })
+    .update({ inactive: !status })
     .eq("id", id);
   if (error === null) {
     await getTodoTemplate();
