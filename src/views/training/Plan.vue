@@ -22,6 +22,7 @@
       :title="wd.name"
       :icon="wd.icon"
       :date="wd.date"
+      :contentLength="wd.contentLength"
     />
   </v-sheet>
 </template>
@@ -30,60 +31,64 @@
 import SplitDay from "@/components/training/SplitDay.vue";
 import { ref } from "vue";
 import { getDayOfCurrentWeek } from "@/helper/dateHelper";
+import { onMounted } from "vue";
+import Weekday from "@/types/custom/Weekday";
 
-const weekdays = ref([
-  {
-    name: "Monday",
-    color: "#673ab7",
-    icon: "mdi-roman-numeral-1",
-    date: getDayOfCurrentWeek(1),
-  },
-  {
-    name: "Tuesday",
-    color: "#603eb6",
-    icon: "mdi-roman-numeral-2",
-    date: getDayOfCurrentWeek(2),
-  },
-  {
-    name: "Wednesday",
-    color: "#5a42b6",
-    icon: "mdi-roman-numeral-3",
-    date: getDayOfCurrentWeek(3),
-  },
-  {
-    name: "Thursday",
-    color: "#5346b6",
-    icon: "mdi-roman-numeral-4",
-    date: getDayOfCurrentWeek(4),
-  },
-  {
-    name: "Friday",
-    color: "#4c4ab6",
-    icon: "mdi-roman-numeral-5",
-    date: getDayOfCurrentWeek(5),
-  },
-  {
-    name: "Saturday",
-    color: "#454eb5",
-    icon: "mdi-roman-numeral-6",
-    date: getDayOfCurrentWeek(6),
-  },
-  {
-    name: "Sunday",
-    color: "#3f51b5",
-    icon: "mdi-roman-numeral-7",
-    date: getDayOfCurrentWeek(7),
-  },
-]);
+const weekdays = ref<Weekday[]>([]);
 
 function prevWeek() {
-  weekdays.value.forEach((wd) => {
+  weekdays.value.forEach(async (wd, index) => {
     wd.date = new Date(wd.date.setDate(wd.date.getDate() - 7));
+    await wd.setup();
   });
 }
+
 function nextWeek() {
-  weekdays.value.forEach((wd) => {
+  weekdays.value.forEach(async (wd, index) => {
     wd.date = new Date(wd.date.setDate(wd.date.getDate() + 7));
+    await wd.setup();
   });
 }
+
+async function initiateWeekdays() {
+  const weekdayNames: string[] = [
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+    "Sunday",
+  ];
+  const colors: string[] = [
+    "#673ab7",
+    "#603eb6",
+    "#5a42b6",
+    "#5346b6",
+    "#4c4ab6",
+    "#454eb5",
+    "#3f51b5",
+  ];
+  const icon: string = "mdi-roman-numeral-";
+
+  for (let i = 1; i <= 7; i++) {
+    weekdays.value.push(
+      new Weekday(
+        i,
+        weekdayNames[i - 1],
+        colors[i - 1],
+        icon + i,
+        getDayOfCurrentWeek(i)
+      )
+    );
+  }
+
+  weekdays.value.forEach(async (wd) => {
+    await wd.setup();
+  });
+}
+
+onMounted(async () => {
+  await initiateWeekdays();
+});
 </script>

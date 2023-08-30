@@ -21,10 +21,25 @@
       class="text-h6 font-weight-black"
       >{{ title + " - " + dateToIsoString(date) }}</v-btn
     >
+
+    <v-sheet>
+      {{ contentLength }}
+    </v-sheet>
   </v-sheet>
 </template>
 
 <script setup lang="ts">
 import { dateToIsoString } from "@/helper/dateHelper";
-defineProps(["title", "color", "icon", "date"]);
+import { Row } from "@/types/supabaseHelper";
+defineProps(["title", "color", "icon", "date", "contentLength"]);
+
+function getFullContentLength(instance: Row<"diary">) {
+  let len = 0;
+  len += instance.title?.length!;
+  len += instance.content?.length!;
+  len += instance.content_uni?.length!;
+  len += instance.content_training?.length!;
+  len += instance.content_projects?.length!;
+  return len;
+}
 </script>

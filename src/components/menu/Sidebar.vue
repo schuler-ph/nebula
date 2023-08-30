@@ -67,7 +67,7 @@ const { logout } = useAuth();
 const links = [
   {
     title: "All entries",
-    to: "/",
+    to: "/allentries",
     icon: "mdi-calendar-month",
   },
   {
@@ -84,7 +84,7 @@ const links = [
 const linksTraining = [
   {
     title: "Plan",
-    to: "/training",
+    to: "/",
     icon: "mdi-hexagon-multiple",
   },
   {
