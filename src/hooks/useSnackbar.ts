@@ -11,6 +11,9 @@ export function useSnackbar() {
       case "error":
         snackbarColor.value = "red-darken-4";
         break;
+      case "info":
+        snackbarColor.value = "blue";
+        break;
     }
     snackbarOpen.value = true;
   }

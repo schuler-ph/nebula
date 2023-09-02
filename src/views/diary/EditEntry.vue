@@ -98,8 +98,8 @@
 
 <script setup lang="ts">
 import { ref } from "vue";
-import { UpdateDto } from "@/types/supabaseHelper";
-import { supabase } from "@/lib/supabaseClient";
+import { InsertDto, UpdateDto } from "@/types/supabaseHelper";
+import { getUserId, supabase } from "@/lib/supabaseClient";
 import ContentInputCollection from "@/components/diary/ContentInputCollection.vue";
 import CustomSnackbar from "@/components/generic/CustomSnackbar.vue";
 import router from "@/router";
@@ -151,7 +151,26 @@ onMounted(async () => {
         last_modified: modifiedTime,
       };
     } else {
-      newSnackbarMessage("This date does not exist!", "error");
+      const tempDate = new Date(day as string)
+      title.value = tempDate.getWeekDayName() + tempDate.getWeek()
+      const entry: InsertDto<"diary"> = {
+        day: day as string,
+        user_id: await getUserId(),
+        title: title.value,
+        content: "",
+        content_training: "",
+        content_uni: "",
+        content_projects: "",
+      };
+      const { error } = await supabase.from("diary").insert(entry);
+
+      if(error === null) {
+        newSnackbarMessage("Missing date was inserted!", "info");
+      }
+      else {
+        newSnackbarMessage("This date doesn't exist and couldn't be created!", "error");
+      }
+
     }
   } else {
     console.log("SELECT ERROR", error);

@@ -33,6 +33,7 @@ declare global {
   interface Date {
     getWeek(): number;
     getWeekYear(): number;
+    getWeekDayName(): string;
   }
 }
 
@@ -67,4 +68,18 @@ export function getWeekFunctions() {
     date.setDate(date.getDate() + 3 - ((date.getDay() + 6) % 7));
     return date.getFullYear();
   };
+
+  Date.prototype.getWeekDayName = function () {
+    const weekdayNames: string[] = [
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday",
+      "Saturday",
+      "Sunday",
+    ];
+
+    return weekdayNames[this.getDay() - 1]
+  }
 }

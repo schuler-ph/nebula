@@ -19,12 +19,8 @@
           : 'text-white'
       "
       class="text-h6 font-weight-black"
-      >{{ title + " - " + dateToIsoString(date) }}</v-btn
+      >{{ title + " - " + dateToIsoString(date) + " - " + contentLength }}</v-btn
     >
-
-    <v-sheet>
-      {{ contentLength }}
-    </v-sheet>
   </v-sheet>
 </template>
 

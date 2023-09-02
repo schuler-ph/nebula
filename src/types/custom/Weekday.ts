@@ -34,11 +34,14 @@ export default class Weekday {
     const { data, error } = await supabase
       .from("diary")
       .select()
-      .eq("day", dateToIsoString(getDayOfCurrentWeek(this.index)));
+      .eq("day", dateToIsoString(this.date));
     if (error === null && data.length !== 0) {
       this.contentLength = this.getFullContentLength(data[0]);
-      console.log(data[0]);
       return data[0];
+    }
+    else {
+      this.contentLength = 0;
+      return undefined;
     }
   }
 
