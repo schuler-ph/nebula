@@ -4,14 +4,18 @@
       rounded="lg"
       class="d-flex align-center justify-center flex-column"
     >
-      <v-row class="mb-4">
+      <v-row class="">
         <v-btn class="ma-5" elevation="10" size="large">
           <span v-if="date">{{ day }}</span>
         </v-btn></v-row
       >
+      <span class="text-grey"
+        >Last edited: {{ modifiedTime?.toLocaleString("de-AT") }}</span
+      >
       <v-text-field
+        readonly
         variant="solo-filled"
-        class="w-50"
+        class="w-50 mt-4"
         v-model.trim="title"
         label="Title"
         color="primary"
@@ -64,8 +68,18 @@
     </v-sheet>
 
     <v-sheet class="d-flex justify-center py-5" rounded="lg">
-      <v-btn class="mr-4" @click="submitUpdate">Submit</v-btn>
-      <v-btn @click="cancelUpdate">Cancel</v-btn>
+      <v-btn
+        @click="cancelUpdate"
+        prepend-icon="mdi-chevron-left"
+        class="fixed cancelButton"
+        >Cancel</v-btn
+      >
+      <v-btn
+        class="fixed submitButton"
+        @click="submitUpdate"
+        append-icon="mdi-send"
+        >Submit</v-btn
+      >
       <v-dialog v-model="cancelDialog" width="auto">
         <v-card>
           <v-card-text>
@@ -112,7 +126,9 @@ import { useDisplay } from "vuetify";
 const { smAndUp } = useDisplay();
 
 const { day } = useRoute().params;
-const modifiedTime = new Date().toUTCString();
+const currentTime = new Date().toUTCString();
+const modifiedTime = ref<Date>();
+
 const {
   date,
   title,
@@ -135,6 +151,7 @@ onMounted(async () => {
     if (data.length !== 0) {
       title.value = data[0].title!;
       currentWeight.value = data[0].currentWeight!;
+      modifiedTime.value = new Date(data[0].last_modified!);
 
       if (currentWeight.value) {
         weightSlider.value = currentWeight.value;
@@ -148,11 +165,11 @@ onMounted(async () => {
         content_projects: data[0].content_projects,
         todoDailyDone: data[0].todoDailyDone,
         currentWeight: data[0].currentWeight,
-        last_modified: modifiedTime,
+        last_modified: currentTime,
       };
     } else {
-      const tempDate = new Date(day as string)
-      title.value = tempDate.getWeekDayName() + tempDate.getWeek()
+      const tempDate = new Date(day as string);
+      title.value = tempDate.getWeekDayName() + tempDate.getWeek();
       const entry: InsertDto<"diary"> = {
         day: day as string,
         user_id: await getUserId(),
@@ -162,15 +179,17 @@ onMounted(async () => {
         content_uni: "",
         content_projects: "",
       };
+      oldEntry = currentEntry();
       const { error } = await supabase.from("diary").insert(entry);
 
-      if(error === null) {
-        newSnackbarMessage("Missing date was inserted!", "info");
+      if (error === null) {
+        newSnackbarMessage("New entry created!", "info");
+      } else {
+        newSnackbarMessage(
+          "This date doesn't exist and couldn't be created!",
+          "error"
+        );
       }
-      else {
-        newSnackbarMessage("This date doesn't exist and couldn't be created!", "error");
-      }
-
     }
   } else {
     console.log("SELECT ERROR", error);
@@ -191,7 +210,7 @@ function currentEntry() {
     content_projects: contentProjects.value,
     todoDailyDone: todoDaily.value,
     currentWeight: currentWeight.value,
-    last_modified: modifiedTime,
+    last_modified: currentTime,
   } as UpdateDto<"diary">;
 }
 
@@ -248,3 +267,16 @@ function centerSlider(a: string) {
   }
 }
 </script>
+
+<style scoped>
+.fixed {
+  position: fixed;
+  bottom: 1.5rem;
+}
+.submitButton {
+  margin-left: 8rem;
+}
+.cancelButton {
+  margin-right: 8rem;
+}
+</style>

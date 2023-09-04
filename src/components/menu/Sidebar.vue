@@ -71,11 +71,6 @@ const links = [
     icon: "mdi-calendar-month",
   },
   {
-    title: "New entry",
-    to: "/new",
-    icon: "mdi-calendar-plus",
-  },
-  {
     title: "Week closure",
     to: "/weekclosure",
     icon: "mdi-calendar-week",

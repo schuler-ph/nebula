@@ -5,12 +5,13 @@
         "Week starting Mon " + weekdays[0].date.toISOString()
       }}</v-sheet> -->
       <v-sheet class="d-flex">
-        <v-btn
-          prepend-icon="mdi-calendar-arrow-left"
-          @click="prevWeek"
-          class="mr-3"
+        <v-btn prepend-icon="mdi-calendar-arrow-left" @click="prevWeek"
           >previous</v-btn
         >
+        <v-btn class="mx-3 text-h6 font-weight-black">
+          Week No°
+          {{ weekdays[0] === undefined ? 0 : weekdays[0].date.getWeek() }}
+        </v-btn>
         <v-btn append-icon="mdi-calendar-arrow-right" @click="nextWeek"
           >next</v-btn
         >
@@ -19,10 +20,11 @@
     <SplitDay
       v-for="wd in weekdays"
       :color="wd.color"
-      :title="wd.name"
+      :weekdayName="wd.name"
       :icon="wd.icon"
       :date="wd.date"
       :contentLength="wd.contentLength"
+      :title="wd.instance?.title"
     />
   </v-sheet>
 </template>

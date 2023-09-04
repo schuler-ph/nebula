@@ -71,15 +71,15 @@ export function getWeekFunctions() {
 
   Date.prototype.getWeekDayName = function () {
     const weekdayNames: string[] = [
+      "Sunday",
       "Monday",
       "Tuesday",
       "Wednesday",
       "Thursday",
       "Friday",
       "Saturday",
-      "Sunday",
     ];
 
-    return weekdayNames[this.getDay() - 1]
-  }
+    return weekdayNames[this.getDay()];
+  };
 }

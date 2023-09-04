@@ -4,29 +4,41 @@
       <v-expansion-panel v-for="todo in template">
         <v-expansion-panel-title>
           <v-sheet class="d-flex align-center">
-            <v-checkbox-btn
-              :value="todo.id"
-              :model-value="modelValue"
-              @click.native="check($event)"
-              @update:model-value="
-                (newVal) => $emit('update:modelValue', newVal)
-              "
-            ></v-checkbox-btn>
-            <h3 class="font-weight-regular">
+            <div>
+              <v-checkbox-btn
+                color="primary"
+                :value="todo.id"
+                :model-value="modelValue"
+                @click.native="check($event)"
+                @update:model-value="
+                  (newVal) => $emit('update:modelValue', newVal)
+                "
+              ></v-checkbox-btn>
+            </div>
+            <span class="text-h5 font-weight-regular">
               {{ capFirst(todo.name) }}
-            </h3></v-sheet
+            </span></v-sheet
           >
         </v-expansion-panel-title>
         <v-expansion-panel-text>
-          <v-sheet v-for="sub in todo.subtodos">
-            <v-checkbox-btn
-              :value="sub.id"
-              :label="capFirst(sub.name)"
-              :model-value="modelValue"
-              @update:model-value="
-                (newVal) => $emit('update:modelValue', newVal)
-              "
-            ></v-checkbox-btn>
+          <v-sheet
+            v-for="sub in todo.subtodos"
+            class="d-flex align-center flex-row justify-start"
+          >
+            <div>
+              <v-checkbox-btn
+                color="primary"
+                :value="sub.id"
+                :model-value="modelValue"
+                @update:model-value="
+                  (newVal) => $emit('update:modelValue', newVal)
+                "
+              >
+              </v-checkbox-btn>
+            </div>
+            <span class="text-h6 font-weight-regular">
+              {{ capFirst(sub.name) }}
+            </span>
           </v-sheet>
         </v-expansion-panel-text>
       </v-expansion-panel>

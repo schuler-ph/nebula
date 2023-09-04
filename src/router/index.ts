@@ -17,11 +17,11 @@ const routes = [
         name: "AllEntries",
         component: () => import("@/views/AllEntries.vue"),
       },
-      {
-        path: "new",
-        name: "NewEntry",
-        component: () => import("@/views/diary/NewEntry.vue"),
-      },
+      // {
+      //   path: "new",
+      //   name: "NewEntry",
+      //   component: () => import("@/views/diary/NewEntry.vue"),
+      // },
       {
         path: "edit/:day",
         name: "EditEntry",
