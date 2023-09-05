@@ -38,15 +38,7 @@
         ></v-btn>
       </v-sheet>
     </v-sheet>
-    <SplitDay
-      v-for="wd in weekdays"
-      :color="wd.color"
-      :weekdayName="wd.name"
-      :icon="wd.icon"
-      :date="wd.date"
-      :contentLength="wd.contentLength"
-      :title="wd.instance?.title"
-    />
+    <SplitDay v-for="wd in weekdays" :wd="wd" :activeDailyTodos="template" />
   </v-sheet>
 </template>
 
@@ -57,9 +49,13 @@ import { getDayOfCurrentWeek } from "@/helper/dateHelper";
 import { onMounted } from "vue";
 import Weekday from "@/types/custom/Weekday";
 import { useDisplay } from "vuetify";
+import { supabase } from "@/lib/supabaseClient";
+import { Row } from "@/types/supabaseHelper";
 const { smAndUp } = useDisplay();
 
 const weekdays = ref<Weekday[]>([]);
+const template = ref<TodoTemplate[]>([]);
+type TodoTemplate = Row<"todo"> & { subtodos?: Row<"todo">[] };
 
 function prevWeek() {
   weekdays.value.forEach(async (wd, index) => {
@@ -115,5 +111,26 @@ async function initiateWeekdays() {
 
 onMounted(async () => {
   await initiateWeekdays();
+
+  const { data, error } = await supabase
+    .from("todo")
+    .select()
+    .not("inactive", "eq", true)
+    .eq("category", "daily")
+    .order("order", { ascending: true });
+
+  if (error === null && data.length !== 0) {
+    let todos: Row<"todo">[];
+    template.value = [];
+    todos = data.filter((d) => d.subtodo_of === null);
+    todos.forEach((t) => {
+      const subtodos = data.filter((d) => d.subtodo_of === t.id);
+      template.value.push({
+        ...t,
+        subtodos,
+      });
+    });
+    console.log(template.value);
+  }
 });
 </script>

@@ -74,7 +74,7 @@ async function getTodoTemplate() {
     .from("todo")
     .select()
     .eq("category", "daily")
-    .order("name", { ascending: true });
+    .order("order", { ascending: true });
   if (error === null && data.length !== 0) {
     todos = data.filter((d) => d.subtodo_of === null);
     todos.forEach((t) => {

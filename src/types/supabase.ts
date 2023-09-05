@@ -164,6 +164,7 @@ export interface Database {
           id: string
           inactive: boolean
           name: string
+          order: number | null
           subtodo_of: string | null
           user_id: string
         }
@@ -173,6 +174,7 @@ export interface Database {
           id?: string
           inactive?: boolean
           name: string
+          order?: number | null
           subtodo_of?: string | null
           user_id: string
         }
@@ -182,6 +184,7 @@ export interface Database {
           id?: string
           inactive?: boolean
           name?: string
+          order?: number | null
           subtodo_of?: string | null
           user_id?: string
         }
