@@ -272,6 +272,7 @@ function centerSlider(a: string) {
 .fixed {
   position: fixed;
   bottom: 1.5rem;
+  z-index: 50;
 }
 .submitButton {
   margin-left: 8rem;
