@@ -19,11 +19,14 @@
           {{ capFirst(todo.name) }}
         </v-expansion-panel-title>
         <v-expansion-panel-text>
-          <v-sheet class="my-2" v-for="sub in todo.subtodos">
+          <v-sheet
+            class="my-3 d-flex align-center"
+            v-for="sub in todo.subtodos"
+          >
             <CustomDialog
               :action="() => todoToggleDone(sub.id, sub.done)"
               :color="sub.done ? 'secondary' : 'primary'"
-              class="mx-5"
+              :class="smAndDown ? 'mr-2' : 'mx-5'"
               :icon="sub.done ? 'mdi-undo' : 'mdi-check'"
               size="x-small"
             >
@@ -31,7 +34,9 @@
                 Are you sure you want to toggle the status of this subtodo?
               </template>
             </CustomDialog>
-            {{ capFirst(sub.name) }}
+            <div>
+              {{ capFirst(sub.name) }}
+            </div>
           </v-sheet>
           <v-divider class="my-5" :thickness="2"></v-divider>
           <v-btn @click="addNewTodo(todo.id)"> New Subtodo </v-btn>
@@ -49,6 +54,8 @@ import { ref } from "vue";
 import { onMounted } from "vue";
 import { capFirst } from "@/helper/stringHelper";
 import CustomDialog from "@/components/generic/CustomDialog.vue";
+import { useDisplay } from "vuetify";
+const { smAndDown } = useDisplay();
 
 const template = ref<TodoTemplate[]>([]);
 type TodoTemplate = Row<"todo"> & { subtodos?: Row<"todo">[] };

@@ -4,17 +4,38 @@
       <!-- <v-sheet class="text-h5 mb-3">{{
         "Week starting Mon " + weekdays[0].date.toISOString()
       }}</v-sheet> -->
-      <v-sheet class="d-flex">
-        <v-btn prepend-icon="mdi-calendar-arrow-left" @click="prevWeek"
+      <v-sheet class="d-flex align-center">
+        <v-btn
+          v-if="smAndUp"
+          prepend-icon="mdi-calendar-arrow-left"
+          @click="prevWeek"
           >previous</v-btn
         >
-        <v-btn class="mx-3 text-h6 font-weight-black">
+        <v-btn
+          v-else
+          icon="mdi-calendar-arrow-left"
+          @click="prevWeek"
+          size="small"
+        ></v-btn>
+        <v-btn
+          v-if="weekdays[0] !== undefined"
+          class="mx-3 text-h6 font-weight-black"
+        >
           Week No°
-          {{ weekdays[0] === undefined ? 0 : weekdays[0].date.getWeek() }}
+          {{ weekdays[0].date.getWeek() }}
         </v-btn>
-        <v-btn append-icon="mdi-calendar-arrow-right" @click="nextWeek"
+        <v-btn
+          v-if="smAndUp"
+          append-icon="mdi-calendar-arrow-right"
+          @click="nextWeek"
           >next</v-btn
         >
+        <v-btn
+          v-else
+          icon="mdi-calendar-arrow-right"
+          @click="nextWeek"
+          size="small"
+        ></v-btn>
       </v-sheet>
     </v-sheet>
     <SplitDay
@@ -35,6 +56,8 @@ import { ref } from "vue";
 import { getDayOfCurrentWeek } from "@/helper/dateHelper";
 import { onMounted } from "vue";
 import Weekday from "@/types/custom/Weekday";
+import { useDisplay } from "vuetify";
+const { smAndUp } = useDisplay();
 
 const weekdays = ref<Weekday[]>([]);
 

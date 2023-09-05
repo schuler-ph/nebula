@@ -36,6 +36,18 @@
 
       <v-divider class="my-2"></v-divider>
 
+      <v-list-item
+        v-for="link in linksHistory"
+        :key="link.title"
+        exact
+        :to="link.to"
+        :prepend-icon="link.icon"
+      >
+        <v-list-item-title> {{ link.title }} </v-list-item-title>
+      </v-list-item>
+
+      <v-divider class="my-2"></v-divider>
+
       <v-menu location="start">
         <template v-slot:activator="{ props }">
           <v-list-item
@@ -104,6 +116,14 @@ const linksTodo = [
     title: "Todo Longterm",
     to: "/todo/longterm",
     icon: "mdi-clipboard-text-clock",
+  },
+];
+
+const linksHistory = [
+  {
+    title: "Weight History",
+    to: "/history",
+    icon: "mdi-chart-bell-curve-cumulative",
   },
 ];
 </script>

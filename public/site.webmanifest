@@ -15,5 +15,6 @@
     ],
     "theme_color": "#603cba",
     "background_color": "#603cba",
-    "display": "standalone"
+    "display": "standalone",
+    "start_url": "https://magnificent-rugelach-0a7290.netlify.app/"
 }

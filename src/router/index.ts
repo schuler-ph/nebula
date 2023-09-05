@@ -17,11 +17,6 @@ const routes = [
         name: "AllEntries",
         component: () => import("@/views/AllEntries.vue"),
       },
-      // {
-      //   path: "new",
-      //   name: "NewEntry",
-      //   component: () => import("@/views/diary/NewEntry.vue"),
-      // },
       {
         path: "edit/:day",
         name: "EditEntry",
@@ -56,6 +51,11 @@ const routes = [
         path: "about",
         name: "About",
         component: () => import("@/views/About.vue"),
+      },
+      {
+        path: "history",
+        name: "History",
+        component: () => import("@/views/history/WeightHistory.vue"),
       },
     ],
   },
