@@ -160,9 +160,7 @@ onMounted(async () => {
       oldEntry = {
         title: data[0].title,
         content: data[0].content,
-        content_training: data[0].content_training,
-        content_uni: data[0].content_uni,
-        content_projects: data[0].content_projects,
+        // TODO
         todoDailyDone: data[0].todoDailyDone,
         currentWeight: data[0].currentWeight,
         last_modified: currentTime,
@@ -170,14 +168,13 @@ onMounted(async () => {
     } else {
       const tempDate = new Date(day as string);
       title.value = tempDate.getWeekDayName() + tempDate.getWeek();
+      currentWeight.value = null;
       const entry: InsertDto<"diary"> = {
         day: day as string,
         user_id: await getUserId(),
         title: title.value,
         content: "",
-        content_training: "",
-        content_uni: "",
-        content_projects: "",
+        // TODO
       };
       oldEntry = currentEntry();
       const { error } = await supabase.from("diary").insert(entry);
@@ -205,9 +202,7 @@ function currentEntry() {
   return {
     title: title.value,
     content: content.value,
-    content_training: contentTraining.value,
-    content_uni: contentUni.value,
-    content_projects: contentProjects.value,
+    // TODO
     todoDailyDone: todoDaily.value,
     currentWeight: currentWeight.value,
     last_modified: currentTime,

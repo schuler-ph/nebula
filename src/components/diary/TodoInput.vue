@@ -11,14 +11,33 @@
                 :model-value="modelValue"
                 @click.native="check($event)"
                 @update:model-value="
-                  (newVal) => $emit('update:modelValue', newVal)
+                  (newVal) => {
+                    const adding = newVal.indexOf(todo.id) !== -1;
+
+                    todo.subtodos?.forEach((sub) => {
+                      const index = newVal.indexOf(sub.id);
+
+                      if (adding && index === -1) {
+                        newVal.push(sub.id);
+                      } else if (!adding && index !== -1) {
+                        newVal.splice(index, 1);
+                      }
+                    });
+
+                    $emit('update:modelValue', newVal);
+                  }
                 "
               ></v-checkbox-btn>
             </div>
             <span class="text-h5 font-weight-regular">
-              {{ capFirst(todo.name) }}
-            </span></v-sheet
-          >
+              {{ capFirst(todo.name) }} ({{
+                modelValue?.filter((i1) =>
+                  todo.subtodos?.some((i2) => i2.id === i1)
+                ).length
+              }}
+              / {{ todo.subtodos?.length }})
+            </span>
+          </v-sheet>
         </v-expansion-panel-title>
         <v-expansion-panel-text>
           <v-sheet
@@ -31,7 +50,20 @@
                 :value="sub.id"
                 :model-value="modelValue"
                 @update:model-value="
-                  (newVal) => $emit('update:modelValue', newVal)
+                  (newVal) => {
+                    const mainIndex = newVal.indexOf(todo.id);
+                    const done =
+                      mainIndex === -1 ? newVal.length : newVal.length - 1;
+                    const total = todo.subtodos?.length;
+
+                    if (done === total && mainIndex === -1) {
+                      newVal.push(todo.id);
+                    } else if (done !== total && mainIndex !== -1) {
+                      newVal.splice(mainIndex, 1);
+                    }
+
+                    $emit('update:modelValue', newVal);
+                  }
                 "
               >
               </v-checkbox-btn>
@@ -52,7 +84,14 @@ import { supabase } from "@/lib/supabaseClient";
 import { Row } from "@/types/supabaseHelper";
 import { onMounted, ref } from "vue";
 
-const { category } = defineProps(["modelValue", "color", "category"]);
+const { modelValue } = defineProps({
+  modelValue: {
+    type: Array<string>,
+  },
+  color: {
+    type: String,
+  },
+});
 defineEmits(["update:modelValue"]);
 
 const template = ref<TodoTemplate[]>([]);

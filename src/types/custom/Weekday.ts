@@ -6,22 +6,14 @@ export default class Weekday {
   index: number;
   name: string;
   color: string;
-  icon: string;
   date: Date;
   instance?: Row<"diary">;
   contentLength: number;
 
-  constructor(
-    index: number,
-    name: string,
-    color: string,
-    icon: string,
-    date: Date
-  ) {
+  constructor(index: number, name: string, color: string, date: Date) {
     this.index = index;
     this.name = name;
     this.color = color;
-    this.icon = icon;
     this.date = date;
     this.contentLength = 0;
   }
@@ -38,8 +30,7 @@ export default class Weekday {
     if (error === null && data.length !== 0) {
       this.contentLength = this.getFullContentLength(data[0]);
       return data[0];
-    }
-    else {
+    } else {
       this.contentLength = 0;
       return undefined;
     }
@@ -47,11 +38,7 @@ export default class Weekday {
 
   getFullContentLength(instance: any) {
     let len = 0;
-    len += instance.title.length;
     len += instance.content.length;
-    len += instance.content_uni.length;
-    len += instance.content_training.length;
-    len += instance.content_projects.length;
     return len;
   }
 }

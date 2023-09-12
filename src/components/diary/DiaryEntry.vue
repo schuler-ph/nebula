@@ -67,11 +67,8 @@ async function deleteThisEntry() {
 
 function getFullContentLength() {
   let len = 0;
-  len += entry.title?.length!;
   len += entry.content?.length!;
-  len += entry.content_uni?.length!;
-  len += entry.content_training?.length!;
-  len += entry.content_projects?.length!;
+  // TODO
   return len;
 }
 </script>

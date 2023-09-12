@@ -20,6 +20,7 @@
         <v-btn
           v-if="weekdays[0] !== undefined"
           class="mx-3 text-h6 font-weight-black"
+          @click="() => resetWeek()"
         >
           Week No°
           {{ weekdays[0].date.getWeek() }}
@@ -45,12 +46,17 @@
 <script setup lang="ts">
 import SplitDay from "@/components/training/SplitDay.vue";
 import { ref } from "vue";
-import { getDayOfCurrentWeek } from "@/helper/dateHelper";
+import { getWeekIsoDates } from "@/helper/dateHelper";
 import { onMounted } from "vue";
 import Weekday from "@/types/custom/Weekday";
 import { useDisplay } from "vuetify";
 import { supabase } from "@/lib/supabaseClient";
 import { Row } from "@/types/supabaseHelper";
+import router from "@/router";
+import { usePlannerStore } from "@/store/plannerStore";
+
+const { weekOffset, increment, decrement, reset } = usePlannerStore();
+
 const { smAndUp } = useDisplay();
 
 const weekdays = ref<Weekday[]>([]);
@@ -58,20 +64,33 @@ const template = ref<TodoTemplate[]>([]);
 type TodoTemplate = Row<"todo"> & { subtodos?: Row<"todo">[] };
 
 function prevWeek() {
-  weekdays.value.forEach(async (wd, index) => {
+  decrement();
+  weekdays.value.forEach((wd) => {
     wd.date = new Date(wd.date.setDate(wd.date.getDate() - 7));
-    await wd.setup();
+    wd.setup();
+  });
+}
+
+function resetWeek() {
+  reset();
+  const weekDates = getWeekIsoDates(0);
+  weekdays.value.forEach((wd, index) => {
+    wd.date = new Date(weekDates[index]);
+    wd.setup();
   });
 }
 
 function nextWeek() {
-  weekdays.value.forEach(async (wd, index) => {
+  increment();
+  weekdays.value.forEach((wd) => {
     wd.date = new Date(wd.date.setDate(wd.date.getDate() + 7));
-    await wd.setup();
+    wd.setup();
   });
 }
 
 async function initiateWeekdays() {
+  weekdays.value = [];
+
   const weekdayNames: string[] = [
     "Monday",
     "Tuesday",
@@ -90,7 +109,8 @@ async function initiateWeekdays() {
     "#454eb5",
     "#3f51b5",
   ];
-  const icon: string = "mdi-roman-numeral-";
+
+  const weekDates = getWeekIsoDates(weekOffset);
 
   for (let i = 1; i <= 7; i++) {
     weekdays.value.push(
@@ -98,8 +118,7 @@ async function initiateWeekdays() {
         i,
         weekdayNames[i - 1],
         colors[i - 1],
-        icon + i,
-        getDayOfCurrentWeek(i)
+        new Date(weekDates[i - 1])
       )
     );
   }
@@ -130,7 +149,6 @@ onMounted(async () => {
         subtodos,
       });
     });
-    console.log(template.value);
   }
 });
 </script>

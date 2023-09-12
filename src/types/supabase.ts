@@ -12,9 +12,6 @@ export interface Database {
       diary: {
         Row: {
           content: string | null
-          content_projects: string | null
-          content_training: string | null
-          content_uni: string | null
           currentWeight: number | null
           day: string
           id: string
@@ -22,13 +19,9 @@ export interface Database {
           title: string | null
           todoDailyDone: string[]
           user_id: string
-          week_closure: string | null
         }
         Insert: {
           content?: string | null
-          content_projects?: string | null
-          content_training?: string | null
-          content_uni?: string | null
           currentWeight?: number | null
           day: string
           id?: string
@@ -36,13 +29,9 @@ export interface Database {
           title?: string | null
           todoDailyDone?: string[]
           user_id: string
-          week_closure?: string | null
         }
         Update: {
           content?: string | null
-          content_projects?: string | null
-          content_training?: string | null
-          content_uni?: string | null
           currentWeight?: number | null
           day?: string
           id?: string
@@ -50,7 +39,6 @@ export interface Database {
           title?: string | null
           todoDailyDone?: string[]
           user_id?: string
-          week_closure?: string | null
         }
         Relationships: [
           {

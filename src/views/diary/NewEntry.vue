@@ -82,9 +82,7 @@ async function submitInsert() {
     user_id: await getUserId(),
     title: title.value,
     content: content.value,
-    content_training: contentTraining.value,
-    content_uni: contentUni.value,
-    content_projects: contentProjects.value,
+    // TODO
   };
 
   const { error } = await supabase.from("diary").insert(entry);

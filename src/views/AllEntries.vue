@@ -25,7 +25,6 @@ async function getEntries() {
   const { data, error } = await supabase
     .from("diary")
     .select()
-    .is("week_closure", null)
     .order("day", { ascending: false });
   diaryEntries.value = data;
 }

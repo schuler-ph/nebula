@@ -7,7 +7,6 @@
     <v-row class="my-1">
       <v-btn
         @click="$router.push('/edit/' + dateToIsoString(wd.date))"
-        :prepend-icon="wd.icon"
         :color="
           dateToIsoString(wd.date) === dateToIsoString(new Date())
             ? 'white'
@@ -27,17 +26,17 @@
       ></v-row
     >
     <v-row v-if="wd.instance" class="my-1">
+      <v-btn class="mr-2" variant="outlined" color="deep-purple-lighten-4">{{
+        wd.instance.content!.length
+      }}</v-btn>
+      <v-btn class="mr-2" variant="outlined" color="deep-purple-lighten-3">{{
+        wd.instance.content!.length
+      }}</v-btn>
       <v-btn class="mr-2" variant="outlined" color="deep-purple-lighten-2">{{
         wd.instance.content!.length
       }}</v-btn>
-      <v-btn class="mr-2" variant="outlined" color="teal-lighten-2">{{
-        wd.instance.content_uni!.length
-      }}</v-btn>
-      <v-btn class="mr-2" variant="outlined" color="deep-orange-lighten-2">{{
-        wd.instance.content_training!.length
-      }}</v-btn>
-      <v-btn variant="outlined" color="light-green-lighten-2">{{
-        wd.instance.content_projects!.length
+      <v-btn variant="outlined" color="deep-purple-lighten-1">{{
+        wd.instance.content!.length
       }}</v-btn>
     </v-row>
     <v-row v-if="wd.instance" class="my-1">
