@@ -21,6 +21,11 @@
           v-if="weekdays[0] !== undefined"
           class="mx-3 text-h6 font-weight-black"
           @click="() => resetWeek()"
+          :color="
+            weekdays[0].date.getWeek() === currentDate.getWeek()
+              ? 'transparent'
+              : 'primary'
+          "
         >
           Week No°
           {{ weekdays[0].date.getWeek() }}
@@ -56,12 +61,12 @@ import router from "@/router";
 import { usePlannerStore } from "@/store/plannerStore";
 
 const { weekOffset, increment, decrement, reset } = usePlannerStore();
-
 const { smAndUp } = useDisplay();
 
 const weekdays = ref<Weekday[]>([]);
 const template = ref<TodoTemplate[]>([]);
 type TodoTemplate = Row<"todo"> & { subtodos?: Row<"todo">[] };
+const currentDate = new Date();
 
 function prevWeek() {
   decrement();

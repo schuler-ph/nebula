@@ -5,19 +5,46 @@
     <v-expansion-panels>
       <v-expansion-panel v-for="todo in template">
         <v-expansion-panel-title class="text-h5">
-          <CustomDialog
-            :action="() => disableTodo(todo.id, todo.inactive)"
-            :color="todo.inactive ? 'secondary' : 'primary'"
-            class="mr-5 text-h6"
-            :icon="todo.inactive ? 'mdi-delete-restore' : 'mdi-delete'"
-            size="small"
-          >
-            <template v-slot:content>
-              Are you sure you want to
-              {{ todo.inactive ? "enable" : "disable" }} this todo?
-            </template>
-          </CustomDialog>
-          {{ capFirst(todo.name) }}
+          <div class="d-flex align-center">
+            <CustomDialog
+              :action="() => disableTodo(todo.id, todo.inactive)"
+              :color="todo.inactive ? 'secondary' : 'primary'"
+              class="text-h6"
+              :icon="todo.inactive ? 'mdi-delete-restore' : 'mdi-delete'"
+              size="small"
+            >
+              <template v-slot:content>
+                Are you sure you want to
+                {{ todo.inactive ? "enable" : "disable" }} this todo?
+              </template>
+            </CustomDialog>
+            <div class="mx-5">{{ capFirst(todo.name) }}</div>
+            <v-text-field
+              class="d-flex"
+              label="Order"
+              :model-value="todo.order"
+              @update:model-value="
+                (newVal) => {
+                  if (Number(newVal) > 0) {
+                    todo.order = Number(newVal);
+                  }
+                }
+              "
+              @update:focused="
+                async (focused) => {
+                  if (!focused) {
+                    await supabase
+                      .from('todo')
+                      .update({ order: todo.order })
+                      .eq('id', todo.id);
+                    await getTodoTemplate();
+                  }
+                }
+              "
+              @click.native="check($event)"
+              variant="underlined"
+            ></v-text-field>
+          </div>
         </v-expansion-panel-title>
         <v-expansion-panel-text>
           <v-sheet
@@ -85,6 +112,10 @@ async function getTodoTemplate() {
       });
     });
   }
+}
+
+function check(e: Event) {
+  e.stopPropagation();
 }
 
 async function addNewTodo(parent?: string) {

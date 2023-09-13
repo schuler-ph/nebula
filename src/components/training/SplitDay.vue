@@ -22,32 +22,16 @@
         {{
           !xs ? wd.name + " - " : wd.name.charAt(0) + wd.name.charAt(1) + " - "
         }}
-        {{ dateToIsoString(wd.date) + " - " + wd.contentLength }}</v-btn
+        {{ dateToIsoString(wd.date) }}</v-btn
       ></v-row
     >
-    <v-row v-if="wd.instance" class="my-1">
-      <v-btn class="mr-2" variant="outlined" color="deep-purple-lighten-4">{{
+    <v-row v-if="wd.instance && activeDailyTodos" class="my-2">
+      <v-btn class="mr-2" color="deep-purple-lighten-1">{{
         wd.instance.content!.length
       }}</v-btn>
-      <v-btn class="mr-2" variant="outlined" color="deep-purple-lighten-3">{{
-        wd.instance.content!.length
-      }}</v-btn>
-      <v-btn class="mr-2" variant="outlined" color="deep-purple-lighten-2">{{
-        wd.instance.content!.length
-      }}</v-btn>
-      <v-btn variant="outlined" color="deep-purple-lighten-1">{{
-        wd.instance.content!.length
-      }}</v-btn>
-    </v-row>
-    <v-row v-if="wd.instance" class="my-1">
-      <v-btn v-for="todo in activeDailyTodos">
-        {{
-          wd.instance?.todoDailyDone.filter((i1) =>
-            todo.subtodos?.some((i2) => i2.id === i1)
-          ).length
-        }}
-        /
-        {{ todo.subtodos?.length }}
+      <v-btn color="deep-purple-lighten-1">
+        {{ doneSubTodos(activeDailyTodos) }} /
+        {{ totalSubTodos(activeDailyTodos) }}
       </v-btn>
     </v-row>
   </v-sheet>
@@ -62,7 +46,7 @@ const { xs } = useDisplay();
 
 type TodoTemplate = Row<"todo"> & { subtodos?: Row<"todo">[] };
 
-defineProps({
+const { activeDailyTodos, wd } = defineProps({
   wd: {
     required: true,
     type: Weekday,
@@ -71,4 +55,26 @@ defineProps({
     type: Array<TodoTemplate>,
   },
 });
+
+const totalSubTodos = (adt: Array<TodoTemplate>) => {
+  let num = 0;
+
+  adt!.forEach((a) => {
+    num += a.subtodos!.length;
+  });
+
+  return num;
+};
+
+const doneSubTodos = (adt: Array<TodoTemplate>) => {
+  let num = 0;
+
+  adt!.forEach((todo) => {
+    num += wd.instance!.todoDailyDone.filter((i1) =>
+      todo.subtodos?.some((i2) => i2.id === i1)
+    ).length;
+  });
+
+  return num;
+};
 </script>
