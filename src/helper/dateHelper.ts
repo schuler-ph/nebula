@@ -16,7 +16,7 @@ export function dateToIsoString(date1: Date) {
 
 export function getDayOfCurrentWeek(day: number) {
   var curr = new Date();
-  return new Date(curr.setDate(curr.getDate() - (curr.getDay() - day)));
+  return curr.getDay() === 0 ? new Date(curr.setDate(curr.getDate() - (7 - day))) : new Date(curr.setDate(curr.getDate() - (curr.getDay() - day)));
 }
 
 export function getWeekIsoDates(offset: number = 0) {
