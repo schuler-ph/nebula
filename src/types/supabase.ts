@@ -111,6 +111,51 @@ export interface Database {
           }
         ]
       }
+      ingredient: {
+        Row: {
+          carbs: number | null
+          created_at: string
+          fats: number | null
+          id: string
+          kcal: number | null
+          name: string | null
+          protein: number | null
+          salt: number | null
+          sat_fats: number | null
+          sugar: number | null
+          updated_at: string | null
+          usual_weight: number | null
+        }
+        Insert: {
+          carbs?: number | null
+          created_at?: string
+          fats?: number | null
+          id?: string
+          kcal?: number | null
+          name?: string | null
+          protein?: number | null
+          salt?: number | null
+          sat_fats?: number | null
+          sugar?: number | null
+          updated_at?: string | null
+          usual_weight?: number | null
+        }
+        Update: {
+          carbs?: number | null
+          created_at?: string
+          fats?: number | null
+          id?: string
+          kcal?: number | null
+          name?: string | null
+          protein?: number | null
+          salt?: number | null
+          sat_fats?: number | null
+          sugar?: number | null
+          updated_at?: string | null
+          usual_weight?: number | null
+        }
+        Relationships: []
+      }
       split: {
         Row: {
           exercises: string[] | null
@@ -148,32 +193,38 @@ export interface Database {
       todo: {
         Row: {
           category: string
+          created_at: string
           done: boolean
           id: string
           inactive: boolean
           name: string
           order: number | null
           subtodo_of: string | null
+          updated_at: string
           user_id: string
         }
         Insert: {
           category: string
+          created_at?: string
           done?: boolean
           id?: string
           inactive?: boolean
           name: string
           order?: number | null
           subtodo_of?: string | null
+          updated_at?: string
           user_id: string
         }
         Update: {
           category?: string
+          created_at?: string
           done?: boolean
           id?: string
           inactive?: boolean
           name?: string
           order?: number | null
           subtodo_of?: string | null
+          updated_at?: string
           user_id?: string
         }
         Relationships: [

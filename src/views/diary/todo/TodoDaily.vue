@@ -30,17 +30,6 @@
                   }
                 }
               "
-              @update:focused="
-                async (focused) => {
-                  if (!focused) {
-                    await supabase
-                      .from('todo')
-                      .update({ order: todo.order })
-                      .eq('id', todo.id);
-                    await getTodoTemplate();
-                  }
-                }
-              "
               @click.native="check($event)"
               variant="underlined"
             ></v-text-field>
