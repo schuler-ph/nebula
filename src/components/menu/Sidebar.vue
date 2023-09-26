@@ -102,7 +102,7 @@ const linksTraining = [
   {
     title: "Exercises",
     to: "/training/exercises",
-    icon: "mdi-star-three-points",
+    icon: "mdi-octahedron",
   },
 ];
 

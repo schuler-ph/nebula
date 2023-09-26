@@ -51,60 +51,35 @@ export interface Database {
       }
       exercise: {
         Row: {
-          category: number | null
+          category: string
+          created_at: string
           id: string
-          last_modified: string
+          isSkill: boolean
           name: string
+          updated_at: string
           user_id: string
         }
         Insert: {
-          category?: number | null
+          category?: string
+          created_at?: string
           id?: string
-          last_modified?: string
+          isSkill?: boolean
           name: string
+          updated_at?: string
           user_id: string
         }
         Update: {
-          category?: number | null
+          category?: string
+          created_at?: string
           id?: string
-          last_modified?: string
+          isSkill?: boolean
           name?: string
+          updated_at?: string
           user_id?: string
         }
         Relationships: [
           {
-            foreignKeyName: "exercise_category_fkey"
-            columns: ["category"]
-            referencedRelation: "exerciseCategory"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "exercise_user_id_fkey"
-            columns: ["user_id"]
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          }
-        ]
-      }
-      exerciseCategory: {
-        Row: {
-          id: number
-          name: string
-          user_id: string | null
-        }
-        Insert: {
-          id?: number
-          name: string
-          user_id?: string | null
-        }
-        Update: {
-          id?: number
-          name?: string
-          user_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "exerciseCategory_user_id_fkey"
             columns: ["user_id"]
             referencedRelation: "users"
             referencedColumns: ["id"]

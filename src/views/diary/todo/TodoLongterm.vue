@@ -1,7 +1,14 @@
 <template>
   <v-sheet rounded="lg" class="pa-5">
     <v-label>New Todo Name</v-label>
-    <v-text-field v-model="newSubText" variant="solo"></v-text-field>
+    <v-text-field
+      v-model="newSubText"
+      variant="solo"
+      ref="newTodoInput"
+    ></v-text-field>
+    <div class="d-flex justify-center">
+      <v-btn @click="addNewTodo()" class="mb-3"> New Todo </v-btn>
+    </div>
     <v-expansion-panels>
       <v-expansion-panel v-for="todo in template">
         <v-expansion-panel-title class="text-h5">
@@ -22,6 +29,10 @@
           {{ capFirst(todo.name) }}
         </v-expansion-panel-title>
         <v-expansion-panel-text>
+          <div class="d-flex justify-center mt-1 mb-3">
+            <v-btn @click="addNewTodo(todo.id)"> New Subtodo </v-btn>
+          </div>
+          <v-divider class="mb-5" :thickness="2"></v-divider>
           <v-sheet
             class="my-3 d-flex align-center"
             v-for="sub in todo.subtodos"
@@ -54,12 +65,9 @@
               {{ capFirst(sub.name) }}
             </div>
           </v-sheet>
-          <v-divider class="my-5" :thickness="2"></v-divider>
-          <v-btn @click="addNewTodo(todo.id)"> New Subtodo </v-btn>
         </v-expansion-panel-text>
       </v-expansion-panel>
     </v-expansion-panels>
-    <v-btn @click="addNewTodo()" class="mt-5"> New Todo </v-btn>
 
     <v-dialog v-model="editTodoDialogOpen" width="500">
       <v-card>
@@ -94,6 +102,11 @@
       </v-card>
     </v-dialog>
   </v-sheet>
+  <CustomSnackbar
+    v-model="snackbarOpen"
+    :text="snackbarText"
+    :color="snackbarColor"
+  />
 </template>
 
 <script setup lang="ts">
@@ -103,12 +116,17 @@ import { ref } from "vue";
 import { onMounted } from "vue";
 import { capFirst } from "@/helper/stringHelper";
 import CustomDialog from "@/components/generic/CustomDialog.vue";
+import CustomSnackbar from "@/components/generic/CustomSnackbar.vue";
 import { useDisplay } from "vuetify";
+import { useSnackbar } from "@/hooks/useSnackbar";
 const { smAndDown } = useDisplay();
+const { snackbarOpen, snackbarText, snackbarColor, newSnackbarMessage } =
+  useSnackbar();
 
 const template = ref<TodoTemplate[]>([]);
 type TodoTemplate = Row<"todo"> & { subtodos?: Row<"todo">[] };
 const newSubText = ref("");
+const newTodoInput = ref();
 
 const editTodoDialogOpen = ref(false);
 const editTodoId = ref<string>();
@@ -193,6 +211,9 @@ async function addNewTodo(parent?: string) {
       newSubText.value = "";
       await getTodoTemplate();
     }
+  } else {
+    newTodoInput.value.focus();
+    newSnackbarMessage("Define the name of the todo first!", "error");
   }
 }
 
