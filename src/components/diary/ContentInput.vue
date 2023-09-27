@@ -1,5 +1,5 @@
 <template>
-  <v-col cols="12" sm="4" class="mb-2">
+  <v-col cols="12" class="mb-2">
     <v-sheet :class="'bg-' + color" height="100%" rounded="lg" class="ma-1">
       <v-textarea
         :model-value="modelValue"

@@ -26,10 +26,16 @@
       ></v-row
     >
     <v-row v-if="wd.instance && activeDailyTodos" class="my-2">
-      <v-btn class="mr-2" color="deep-purple-lighten-1">{{
-        wd.instance.content!.length
-      }}</v-btn>
-      <v-btn color="deep-purple-lighten-1">
+      <v-btn
+        prepend-icon="mdi-book-open-variant"
+        class="mr-2"
+        color="deep-purple-lighten-1"
+        >{{ wd.instance.content!.length }}</v-btn
+      >
+      <v-btn
+        prepend-icon="mdi-checkbox-marked-circle-outline"
+        color="deep-purple-lighten-1"
+      >
         {{ doneSubTodos(activeDailyTodos) }} /
         {{ totalSubTodos(activeDailyTodos) }}
       </v-btn>

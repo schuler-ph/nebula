@@ -1,55 +1,57 @@
 <template>
   <v-sheet rounded="lg" class="pa-3">
     <div class="d-flex justify-center mb-3">
-      <v-btn @click="() => (addNewExerciseDialog = true)"
-        >Add new Exercise</v-btn
-      >
+      <v-btn @click="() => (tempDialogOpen = true)">Add new Exercise</v-btn>
     </div>
     <ExercisesCategoryOverview
-      category="Push"
-      :exercises="exercisesPush"
+      v-for="cat in categories"
+      :category="cat.name"
+      :exercises="cat.exercises.value"
       @open-new-dialog="(category, isSkill) => openDialog(category, isSkill)"
-    />
-    <ExercisesCategoryOverview
-      category="Pull"
-      :exercises="exercisesPull"
-      @open-new-dialog="(category, isSkill) => openDialog(category, isSkill)"
-    />
-    <ExercisesCategoryOverview
-      category="Legs"
-      :exercises="exercisesLegs"
-      @open-new-dialog="(category, isSkill) => openDialog(category, isSkill)"
-    />
-    <ExercisesCategoryOverview
-      category="Core"
-      :exercises="exercisesCore"
-      @open-new-dialog="(category, isSkill) => openDialog(category, isSkill)"
+      @open-edit-dialog="(exercise) => openEditDialog(exercise)"
     />
   </v-sheet>
-  <v-dialog v-model="addNewExerciseDialog" width="600">
+  <v-dialog v-model="tempDialogOpen" width="600">
     <v-card>
-      <v-card-title>New Exercise</v-card-title>
+      <v-card-title>{{
+        tempId ? "Edit Exercise" : "New Exercise"
+      }}</v-card-title>
       <v-card-text>
         <v-text-field
           label="Name of exercise"
-          v-model="newExerciseText"
+          v-model="tempText"
         ></v-text-field>
         <v-select
           label="Category"
-          v-model="newExerciseCategory"
-          :items="categories"
+          v-model="tempCategory"
+          :items="categories.map((cat) => cat.name)"
         >
         </v-select>
         <v-switch
           label="Skill"
           color="primary"
-          v-model="newExerciseIsSkill"
+          v-model="tempIsSkill"
         ></v-switch>
       </v-card-text>
       <v-card-actions>
-        <v-btn @click="() => (addNewExerciseDialog = false)">Cancel</v-btn>
+        <v-btn @click="() => cancelDialog()">Cancel</v-btn>
+        <v-spacer v-if="tempId !== undefined"></v-spacer>
+        <CustomDialog
+          v-if="tempId !== undefined"
+          :action="deleteExercise"
+          color="red"
+          text="Delete"
+          variant="tonal"
+        >
+          <template v-slot:content>
+            Are you sure you want to delete this exercise?
+          </template>
+        </CustomDialog>
         <v-spacer></v-spacer>
-        <v-btn @click="() => submitNewExercise()">Submit</v-btn>
+        <v-btn v-if="tempId === undefined" @click="() => submitNewExercise()"
+          >Submit</v-btn
+        >
+        <v-btn v-else @click="() => submitEditedExercise()">Submit</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -60,6 +62,7 @@ import { getUserId, supabase } from "@/lib/supabaseClient";
 import { onMounted, ref } from "vue";
 import { Row } from "@/types/supabaseHelper";
 import ExercisesCategoryOverview from "@/components/training/ExercisesCategoryOverview.vue";
+import CustomDialog from "@/components/generic/CustomDialog.vue";
 
 const exercisesPush = ref<Row<"exercise">[]>();
 const exercisesPull = ref<Row<"exercise">[]>();
@@ -83,36 +86,99 @@ const getExercises = async () => {
   }
 };
 
-const addNewExerciseDialog = ref(false);
-const newExerciseText = ref("");
-const newExerciseIsSkill = ref(false);
-const newExerciseCategory = ref();
-const categories = ["Push", "Pull", "Legs", "Core"];
+const tempDialogOpen = ref(false);
+const tempText = ref("");
+const tempIsSkill = ref(false);
+const tempCategory = ref<string | undefined>();
+const tempId = ref();
+
+const categories = [
+  { name: "Push", exercises: exercisesPush },
+  { name: "Pull", exercises: exercisesPull },
+  { name: "Legs", exercises: exercisesLegs },
+  { name: "Core", exercises: exercisesCore },
+];
 
 const submitNewExercise = async () => {
-  if (newExerciseText.value !== "" && newExerciseCategory.value !== undefined) {
+  if (tempText.value !== "" && tempCategory.value !== undefined) {
     const { error } = await supabase.from("exercise").insert({
-      name: newExerciseText.value,
+      name: tempText.value,
       user_id: await getUserId(),
-      isSkill: newExerciseIsSkill.value,
-      category: newExerciseCategory.value,
+      isSkill: tempIsSkill.value,
+      category: tempCategory.value,
     });
 
     if (error !== null) {
       console.log(error);
     } else {
       await getExercises();
-      addNewExerciseDialog.value = false;
-      newExerciseText.value = "";
-      newExerciseCategory.value = undefined;
-      newExerciseIsSkill.value = false;
+      tempDialogOpen.value = false;
+      tempText.value = "";
+      tempCategory.value = undefined;
+      tempIsSkill.value = false;
     }
   }
 };
 
-const openDialog = (category: String, isSkill: boolean) => {
-  newExerciseCategory.value = category;
-  newExerciseIsSkill.value = isSkill;
-  addNewExerciseDialog.value = true;
+const submitEditedExercise = async () => {
+  if (tempText.value !== "" && tempCategory.value !== undefined) {
+    const updated_at = new Date().toUTCString();
+    const { error } = await supabase
+      .from("exercise")
+      .update({
+        name: tempText.value,
+        user_id: await getUserId(),
+        isSkill: tempIsSkill.value,
+        category: tempCategory.value,
+        updated_at,
+      })
+      .eq("id", tempId.value);
+
+    if (error !== null) {
+      console.log(error);
+    } else {
+      await getExercises();
+      tempDialogOpen.value = false;
+      tempId.value = undefined;
+      tempText.value = "";
+      tempCategory.value = undefined;
+      tempIsSkill.value = false;
+    }
+  }
+};
+
+const cancelDialog = () => {
+  tempDialogOpen.value = false;
+  tempId.value = undefined;
+  tempCategory.value = undefined;
+  tempIsSkill.value = false;
+  tempText.value = "";
+};
+
+const openDialog = (category: string, isSkill: boolean) => {
+  tempId.value = undefined;
+  tempCategory.value = category;
+  tempIsSkill.value = isSkill;
+  tempDialogOpen.value = true;
+};
+
+const openEditDialog = (exercise: Row<"exercise">) => {
+  tempText.value = exercise.name;
+  tempCategory.value = exercise.category;
+  tempIsSkill.value = exercise.isSkill;
+  tempId.value = exercise.id;
+  tempDialogOpen.value = true;
+};
+
+const deleteExercise = async () => {
+  const { error } = await supabase
+    .from("exercise")
+    .delete()
+    .eq("id", tempId.value);
+  if (error !== null) {
+    console.log(error);
+  }
+  cancelDialog();
+  await getExercises();
 };
 </script>
