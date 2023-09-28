@@ -92,17 +92,17 @@ const linksTraining = [
   {
     title: "Plan",
     to: "/",
-    icon: "mdi-hexagon-multiple",
+    icon: "mdi-rhombus-split-outline",
   },
   {
     title: "Split",
     to: "/training/split",
-    icon: "mdi-hexagon",
+    icon: "mdi-octahedron",
   },
   {
     title: "Exercises",
     to: "/training/exercises",
-    icon: "mdi-octahedron",
+    icon: "mdi-pyramid",
   },
 ];
 
