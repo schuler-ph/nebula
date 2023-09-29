@@ -13,16 +13,23 @@
     >
       <v-divider class="mb-3" :thickness="2" />
       <div class="d-flex align-center">
-        <div class="text-black">{{ capFirst(exSkill.name) }}</div>
-        <v-spacer />
-        <div class="text-black">
-          {{
-            subCategoryTranslator(exSkill.subCategory) +
-            exSkill.category +
-            " " +
-            skillTranslator(exSkill.isSkill)
-          }}
+        <div
+          class="d-flex text-black"
+          :class="xs ? 'flex-column' : 'flex-row justify-between w-100'"
+        >
+          <div>{{ capFirst(exSkill.name) }}</div>
+
+          <v-spacer v-if="!xs" />
+          <div>
+            {{
+              subCategoryTranslator(exSkill.subCategory) +
+              exSkill.category +
+              " " +
+              skillTranslator(exSkill.isSkill)
+            }}
+          </div>
         </div>
+        <v-spacer v-if="xs" />
         <v-btn
           size="small"
           color="black"
@@ -74,6 +81,9 @@ import {
   skillTranslator,
 } from "@/helper/stringHelper";
 import { Row } from "@/types/supabaseHelper";
+import { useDisplay } from "vuetify/lib/framework.mjs";
+const { xs } = useDisplay();
+
 defineProps({
   category: String,
   exercises: Array<Row<"exercise">>,

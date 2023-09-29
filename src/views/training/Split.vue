@@ -10,6 +10,7 @@
       @update:model-value="
         (mv) => {
           selectedCategories = splits.find((s) => s.id === mv)?.categories!
+          getExercisesBySelCat();
         }
       "
     />

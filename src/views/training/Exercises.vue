@@ -22,32 +22,33 @@
           v-model="tempText"
         ></v-text-field>
 
-        <div class="d-flex align-center">
+        <div
+          class="d-flex align-stretch"
+          :class="xs ? 'flex-column' : 'flex-row'"
+        >
           <v-select
             v-model="tempSubCategory"
             :items="subCategories"
             item-title="name"
             item-value="val"
             label="Sub-Category"
-            class="mr-4"
+            :class="xs ? 'mb-4' : 'mr-4'"
             hide-details
             v-if="tempCategory === 'Push' || tempCategory === 'Pull'"
           />
           <v-select
-            class="mr-4"
+            :class="xs ? 'mb-4' : 'mr-4'"
             hide-details
             label="Category"
             v-model="tempCategory"
             :items="categories.map((cat) => cat.name)"
           />
-          <div>
-            <v-switch
-              class="d-flex align-center"
-              :label="tempIsSkill ? 'Skill' : 'Basic'"
-              color="primary"
-              v-model="tempIsSkill"
-            />
-          </div>
+          <v-switch
+            class="d-flex justify-center align-center"
+            :label="tempIsSkill ? 'Skill' : 'Basic'"
+            color="primary"
+            v-model="tempIsSkill"
+          />
         </div>
       </v-card-text>
       <v-card-actions>
@@ -80,6 +81,8 @@ import { onMounted, ref } from "vue";
 import { Row } from "@/types/supabaseHelper";
 import ExercisesCategoryOverview from "@/components/training/ExercisesCategoryOverview.vue";
 import CustomDialog from "@/components/generic/CustomDialog.vue";
+import { useDisplay } from "vuetify/lib/framework.mjs";
+const { xs } = useDisplay();
 
 const exercisesPush = ref<Row<"exercise">[]>();
 const exercisesPull = ref<Row<"exercise">[]>();
