@@ -21,17 +21,34 @@
           label="Name of exercise"
           v-model="tempText"
         ></v-text-field>
-        <v-select
-          label="Category"
-          v-model="tempCategory"
-          :items="categories.map((cat) => cat.name)"
-        >
-        </v-select>
-        <v-switch
-          label="Skill"
-          color="primary"
-          v-model="tempIsSkill"
-        ></v-switch>
+
+        <div class="d-flex align-center">
+          <v-select
+            v-model="tempSubCategory"
+            :items="subCategories"
+            item-title="name"
+            item-value="val"
+            label="Sub-Category"
+            class="mr-4"
+            hide-details
+            v-if="tempCategory === 'Push' || tempCategory === 'Pull'"
+          />
+          <v-select
+            class="mr-4"
+            hide-details
+            label="Category"
+            v-model="tempCategory"
+            :items="categories.map((cat) => cat.name)"
+          />
+          <div>
+            <v-switch
+              class="d-flex align-center"
+              :label="tempIsSkill ? 'Skill' : 'Basic'"
+              color="primary"
+              v-model="tempIsSkill"
+            />
+          </div>
+        </div>
       </v-card-text>
       <v-card-actions>
         <v-btn @click="() => cancelDialog()">Cancel</v-btn>
@@ -77,7 +94,8 @@ const getExercises = async () => {
   const { data, error } = await supabase
     .from("exercise")
     .select()
-    .order("updated_at");
+    .order("subCategory")
+    .order("name", { ascending: true });
   if (error === null && data.length !== 0) {
     exercisesPush.value = data.filter((d) => d.category === "Push");
     exercisesPull.value = data.filter((d) => d.category === "Pull");
@@ -90,6 +108,7 @@ const tempDialogOpen = ref(false);
 const tempText = ref("");
 const tempIsSkill = ref(false);
 const tempCategory = ref<string | undefined>();
+const tempSubCategory = ref<string | null>(null);
 const tempId = ref();
 
 const categories = [
@@ -97,6 +116,11 @@ const categories = [
   { name: "Pull", exercises: exercisesPull },
   { name: "Legs", exercises: exercisesLegs },
   { name: "Core", exercises: exercisesCore },
+];
+const subCategories = [
+  { name: "Horizontal", val: "H" },
+  { name: "Vertical", val: "V" },
+  { name: "N/A", val: null },
 ];
 
 const submitNewExercise = async () => {
@@ -106,16 +130,14 @@ const submitNewExercise = async () => {
       user_id: await getUserId(),
       isSkill: tempIsSkill.value,
       category: tempCategory.value,
+      subCategory: tempSubCategory.value,
     });
 
     if (error !== null) {
       console.log(error);
     } else {
       await getExercises();
-      tempDialogOpen.value = false;
-      tempText.value = "";
-      tempCategory.value = undefined;
-      tempIsSkill.value = false;
+      cancelDialog();
     }
   }
 };
@@ -130,6 +152,7 @@ const submitEditedExercise = async () => {
         user_id: await getUserId(),
         isSkill: tempIsSkill.value,
         category: tempCategory.value,
+        subCategory: tempSubCategory.value,
         updated_at,
       })
       .eq("id", tempId.value);
@@ -138,11 +161,7 @@ const submitEditedExercise = async () => {
       console.log(error);
     } else {
       await getExercises();
-      tempDialogOpen.value = false;
-      tempId.value = undefined;
-      tempText.value = "";
-      tempCategory.value = undefined;
-      tempIsSkill.value = false;
+      cancelDialog();
     }
   }
 };
@@ -152,6 +171,7 @@ const cancelDialog = () => {
   tempId.value = undefined;
   tempCategory.value = undefined;
   tempIsSkill.value = false;
+  tempSubCategory.value = null;
   tempText.value = "";
 };
 
@@ -166,6 +186,7 @@ const openEditDialog = (exercise: Row<"exercise">) => {
   tempText.value = exercise.name;
   tempCategory.value = exercise.category;
   tempIsSkill.value = exercise.isSkill;
+  tempSubCategory.value = exercise.subCategory;
   tempId.value = exercise.id;
   tempDialogOpen.value = true;
 };

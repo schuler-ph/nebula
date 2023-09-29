@@ -56,6 +56,7 @@ export interface Database {
           id: string
           isSkill: boolean
           name: string
+          subCategory: string | null
           updated_at: string
           user_id: string
         }
@@ -65,6 +66,7 @@ export interface Database {
           id?: string
           isSkill?: boolean
           name: string
+          subCategory?: string | null
           updated_at?: string
           user_id: string
         }
@@ -74,6 +76,7 @@ export interface Database {
           id?: string
           isSkill?: boolean
           name?: string
+          subCategory?: string | null
           updated_at?: string
           user_id?: string
         }
@@ -133,7 +136,8 @@ export interface Database {
       }
       split: {
         Row: {
-          exercises: string[] | null
+          categories: string[]
+          exercises: string[]
           id: string
           index: number | null
           last_modified: string
@@ -141,7 +145,8 @@ export interface Database {
           user_id: string
         }
         Insert: {
-          exercises?: string[] | null
+          categories?: string[]
+          exercises: string[]
           id?: string
           index?: number | null
           last_modified?: string
@@ -149,7 +154,8 @@ export interface Database {
           user_id: string
         }
         Update: {
-          exercises?: string[] | null
+          categories?: string[]
+          exercises?: string[]
           id?: string
           index?: number | null
           last_modified?: string

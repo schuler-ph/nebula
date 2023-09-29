@@ -15,6 +15,14 @@
       <div class="d-flex align-center">
         <div class="text-black">{{ capFirst(exSkill.name) }}</div>
         <v-spacer />
+        <div class="text-black">
+          {{
+            subCategoryTranslator(exSkill.subCategory) +
+            exSkill.category +
+            " " +
+            skillTranslator(exSkill.isSkill)
+          }}
+        </div>
         <v-btn
           size="small"
           color="black"
@@ -39,6 +47,14 @@
       <div class="d-flex align-center">
         <div class="text-black">{{ capFirst(exBasics.name) }}</div>
         <v-spacer />
+        <div class="text-black">
+          {{
+            subCategoryTranslator(exBasics.subCategory) +
+            exBasics.category +
+            " " +
+            skillTranslator(exBasics.isSkill)
+          }}
+        </div>
         <v-btn
           size="small"
           color="black"
@@ -52,7 +68,11 @@
 </template>
 
 <script setup lang="ts">
-import { capFirst } from "@/helper/stringHelper";
+import {
+  capFirst,
+  subCategoryTranslator,
+  skillTranslator,
+} from "@/helper/stringHelper";
 import { Row } from "@/types/supabaseHelper";
 defineProps({
   category: String,

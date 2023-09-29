@@ -1,36 +1,46 @@
 <template>
-  <v-sheet rounded="lg">
+  <v-sheet rounded="lg" class="pa-3">
     <v-select
       v-model="selectedSplit"
       :items="splits"
       item-title="name"
       item-value="id"
+      hide-details
+      class="mb-3"
+      @update:model-value="
+        (mv) => {
+          selectedCategories = splits.find((s) => s.id === mv)?.categories!
+        }
+      "
     />
 
     <v-sheet v-if="selectedSplit !== undefined">
-      <div class="d-flex">
+      <div class="d-flex align-center mb-3">
         <v-select
           v-model="selectedCategories"
           :items="categories"
           multiple
           chips
-        />
-        <v-btn
-          label="Get exercises"
-          append-icon="mdi-reload"
-          @click="() => getExercisesBySelCat()"
+          hide-details
+          @update:model-value="
+            (mv) => {
+              getExercisesBySelCat();
+            }
+          "
         />
       </div>
       <div v-if="exercisesByCategory.length !== 0">
         <v-select
           v-model="selectedExercises"
           :items="exercisesByCategory"
-          :item-props="itemProps as any"
+          :item-props="itemProps"
           multiple
           chips
         ></v-select>
       </div>
     </v-sheet>
+
+    <v-btn @click="() => submitChanges()">Submit</v-btn>
   </v-sheet>
   <CustomSnackbar
     v-model="snackbarOpen"
@@ -45,7 +55,11 @@ import { onMounted, ref } from "vue";
 import { Row } from "@/types/supabaseHelper";
 import { useSnackbar } from "@/hooks/useSnackbar";
 import CustomSnackbar from "@/components/generic/CustomSnackbar.vue";
-import { capFirst } from "@/helper/stringHelper";
+import {
+  capFirst,
+  subCategoryTranslator,
+  skillTranslator,
+} from "@/helper/stringHelper";
 
 const { snackbarOpen, snackbarText, snackbarColor, newSnackbarMessage } =
   useSnackbar();
@@ -59,6 +73,10 @@ const exercisesByCategory = ref<Row<"exercise">[]>([]);
 const selectedExercises = ref<Array<string>>([]);
 
 onMounted(async () => {
+  await getSplits();
+});
+
+const getSplits = async () => {
   const { data, error } = await supabase
     .from("split")
     .select()
@@ -68,33 +86,48 @@ onMounted(async () => {
   } else {
     console.log(error);
   }
-});
+};
 
 const getExercisesBySelCat = async () => {
   exercisesByCategory.value = [];
   const { data, error } = await supabase
     .from("exercise")
     .select()
-    .order("updated_at");
+    .order("category")
+    .order("isSkill", { ascending: false })
+    .order("subCategory")
+    .order("name");
   if (error === null && data.length !== 0) {
     selectedCategories.value.forEach((sel) => {
-      exercisesByCategory.value.push(
-        ...data.filter((d) => d.category === sel && d.isSkill === true)
-      );
-      exercisesByCategory.value.push(
-        ...data.filter((d) => d.category === sel && d.isSkill === false)
-      );
+      exercisesByCategory.value.push(...data.filter((d) => d.category === sel));
     });
   } else {
     console.log(error);
   }
 };
 
-const itemProps = (item: Row<"exercise">) => {
-  const skillLabel = item.isSkill ? "Skill" : "Basic";
+const itemProps: any = (item: Row<"exercise">) => {
+  const subtitle =
+    subCategoryTranslator(item.subCategory) +
+    item.category +
+    " " +
+    skillTranslator(item.isSkill);
+
   return {
     title: capFirst(item.name),
-    subtitle: item.category + " " + skillLabel,
+    subtitle,
   };
+};
+
+const submitChanges = async () => {
+  const { error } = await supabase
+    .from("split")
+    .update({ categories: selectedCategories.value })
+    .eq("id", selectedSplit.value);
+  if (error) {
+    console.log(error);
+  } else {
+    await getSplits();
+  }
 };
 </script>
