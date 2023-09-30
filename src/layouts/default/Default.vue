@@ -1,5 +1,5 @@
 <template>
-  <v-app id="inspire">
+  <v-app id="nebula">
     <v-app-bar flat :image="nebulaBg" elevation="10">
       <v-container class="fill-height d-flex align-center justify-center pa-0">
         <v-avatar :image="nebulaLogo" size="48"></v-avatar>
@@ -31,7 +31,10 @@
       </v-container>
     </v-app-bar>
 
-    <v-main class="bg-deep-purple-lighten-5">
+    <v-main
+      :class="trainingStatus ? 'mainMarginBottomForTrainingBar' : ''"
+      class="bg-deep-purple-lighten-5"
+    >
       <!-- <v-toolbar
         class="bg-white pl-6"
         :border="true"
@@ -54,6 +57,8 @@
         </v-row>
       </v-container>
     </v-main>
+
+    <div v-if="trainingStatus" id="bottomTrainingBar">oifgohdf</div>
   </v-app>
 </template>
 
@@ -64,6 +69,9 @@ const { smAndDown, xs, md } = useDisplay();
 
 import nebulaLogo from "@/assets/logo.svg";
 import nebulaBg from "@/assets/bg/appBarNebula.jpg";
+import { usePlannerStore } from "@/store/plannerStore";
+
+const { trainingStatus } = usePlannerStore();
 
 const links = [
   {
@@ -76,3 +84,18 @@ const links = [
   },
 ];
 </script>
+
+<style scoped>
+.mainMarginBottomForTrainingBar {
+  margin-bottom: 5rem;
+}
+#bottomTrainingBar {
+  bottom: 0;
+  left: 0;
+  display: block;
+  position: fixed;
+  width: 100%;
+  height: 5rem;
+  background-color: #3f51b5;
+}
+</style>

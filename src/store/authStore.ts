@@ -18,4 +18,5 @@ export const useAuthStore = defineStore("auth", {
       this.auth_loading = true;
     },
   },
+  persist: true,
 });

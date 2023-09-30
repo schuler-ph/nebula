@@ -1,6 +1,6 @@
 {
   "name": "nebula",
-  "version": "0.3.4",
+  "version": "0.3.5",
   "scripts": {
     "dev": "vite",
     "types": "npx supabase gen types typescript --project-id \"nsysvbhfzbomwglmhzus\" --schema public > src/types/supabase.ts",
@@ -11,6 +11,7 @@
     "@mdi/font": "7.0.96",
     "@supabase/supabase-js": "^2.26.0",
     "pinia": "^2.0.23",
+    "pinia-plugin-persistedstate": "^3.2.0",
     "roboto-fontface": "*",
     "vue": "^3.2.0",
     "vue-router": "^4.0.0",
