@@ -49,25 +49,33 @@
       <v-card-title>Basics</v-card-title>
     </div>
     <v-card-item
-      v-for="exBasics in exercises?.filter((e) => e.isSkill === false)"
-      ><v-divider class="mb-3" :thickness="2" />
+      v-for="exBasic in exercises?.filter((e) => e.isSkill === false)"
+    >
+      <v-divider class="mb-3" :thickness="2" />
       <div class="d-flex align-center">
-        <div class="text-black">{{ capFirst(exBasics.name) }}</div>
-        <v-spacer />
-        <div class="text-black">
-          {{
-            subCategoryTranslator(exBasics.subCategory) +
-            exBasics.category +
-            " " +
-            skillTranslator(exBasics.isSkill)
-          }}
+        <div
+          class="d-flex text-black"
+          :class="xs ? 'flex-column' : 'flex-row justify-between w-100'"
+        >
+          <div>{{ capFirst(exBasic.name) }}</div>
+
+          <v-spacer v-if="!xs" />
+          <div>
+            {{
+              subCategoryTranslator(exBasic.subCategory) +
+              exBasic.category +
+              " " +
+              skillTranslator(exBasic.isSkill)
+            }}
+          </div>
         </div>
+        <v-spacer v-if="xs" />
         <v-btn
           size="small"
           color="black"
           icon="mdi-dots-vertical"
           variant="plain"
-          @click="() => emit('openEditDialog', exBasics)"
+          @click="() => emit('openEditDialog', exBasic)"
         ></v-btn>
       </div>
     </v-card-item>

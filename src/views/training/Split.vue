@@ -9,7 +9,8 @@
       class="mb-3"
       @update:model-value="
         (mv) => {
-          selectedCategories = splits.find((s) => s.id === mv)?.categories!
+          selectedCategories = splits.find((s) => s.id === mv)?.categories!;
+          selectedExercises = splits.find((s) => s.id === mv)?.exercises!;
           getExercisesBySelCat();
         }
       "
@@ -35,6 +36,8 @@
           v-model="selectedExercises"
           :items="exercisesByCategory"
           :item-props="itemProps"
+          item-title="name"
+          item-value="id"
           multiple
           chips
         ></v-select>
@@ -65,6 +68,7 @@ import {
 const { snackbarOpen, snackbarText, snackbarColor, newSnackbarMessage } =
   useSnackbar();
 const splits = ref<Row<"split">[]>([]);
+const allExercises = ref<Row<"exercise">[]>([]);
 const selectedSplit = ref();
 
 const categories = ["Push", "Pull", "Legs", "Core"];
@@ -74,37 +78,41 @@ const exercisesByCategory = ref<Row<"exercise">[]>([]);
 const selectedExercises = ref<Array<string>>([]);
 
 onMounted(async () => {
-  await getSplits();
+  await getSplitsAndExercises();
 });
 
-const getSplits = async () => {
-  const { data, error } = await supabase
+const getSplitsAndExercises = async () => {
+  const { data: data1, error: error1 } = await supabase
     .from("split")
     .select()
     .order("index", { ascending: true });
-  if (error === null && data.length !== 0) {
-    splits.value = data;
+  if (error1 === null && data1.length !== 0) {
+    splits.value = data1;
   } else {
-    console.log(error);
+    console.log(error1);
   }
-};
-
-const getExercisesBySelCat = async () => {
-  exercisesByCategory.value = [];
-  const { data, error } = await supabase
+  const { data: data2, error: error2 } = await supabase
     .from("exercise")
     .select()
     .order("category")
     .order("isSkill", { ascending: false })
     .order("subCategory")
     .order("name");
-  if (error === null && data.length !== 0) {
-    selectedCategories.value.forEach((sel) => {
-      exercisesByCategory.value.push(...data.filter((d) => d.category === sel));
-    });
+
+  if (error2 === null && data2.length !== 0) {
+    allExercises.value = data2;
   } else {
-    console.log(error);
+    console.log(error2);
   }
+};
+
+const getExercisesBySelCat = () => {
+  exercisesByCategory.value = [];
+  selectedCategories.value.forEach((sel) => {
+    exercisesByCategory.value.push(
+      ...allExercises.value.filter((d) => d.category === sel)
+    );
+  });
 };
 
 const itemProps: any = (item: Row<"exercise">) => {
@@ -115,7 +123,7 @@ const itemProps: any = (item: Row<"exercise">) => {
     skillTranslator(item.isSkill);
 
   return {
-    title: capFirst(item.name),
+    title: item.name,
     subtitle,
   };
 };
@@ -123,12 +131,15 @@ const itemProps: any = (item: Row<"exercise">) => {
 const submitChanges = async () => {
   const { error } = await supabase
     .from("split")
-    .update({ categories: selectedCategories.value })
+    .update({
+      categories: selectedCategories.value,
+      exercises: selectedExercises.value,
+    })
     .eq("id", selectedSplit.value);
   if (error) {
     console.log(error);
   } else {
-    await getSplits();
+    await getSplitsAndExercises();
   }
 };
 </script>

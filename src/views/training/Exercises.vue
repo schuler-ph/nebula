@@ -82,6 +82,7 @@ import { Row } from "@/types/supabaseHelper";
 import ExercisesCategoryOverview from "@/components/training/ExercisesCategoryOverview.vue";
 import CustomDialog from "@/components/generic/CustomDialog.vue";
 import { useDisplay } from "vuetify/lib/framework.mjs";
+import { capFirst } from "@/helper/stringHelper";
 const { xs } = useDisplay();
 
 const exercisesPush = ref<Row<"exercise">[]>();
@@ -129,7 +130,7 @@ const subCategories = [
 const submitNewExercise = async () => {
   if (tempText.value !== "" && tempCategory.value !== undefined) {
     const { error } = await supabase.from("exercise").insert({
-      name: tempText.value,
+      name: capFirst(tempText.value),
       user_id: await getUserId(),
       isSkill: tempIsSkill.value,
       category: tempCategory.value,
@@ -151,7 +152,7 @@ const submitEditedExercise = async () => {
     const { error } = await supabase
       .from("exercise")
       .update({
-        name: tempText.value,
+        name: capFirst(tempText.value),
         user_id: await getUserId(),
         isSkill: tempIsSkill.value,
         category: tempCategory.value,
