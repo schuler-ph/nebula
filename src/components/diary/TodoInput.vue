@@ -81,6 +81,7 @@
 <script setup lang="ts">
 import { capFirst } from "@/helper/stringHelper";
 import { supabase } from "@/lib/supabaseClient";
+import { useStorageStore } from "@/store/storageStore";
 import { Row } from "@/types/supabaseHelper";
 import { onMounted, ref } from "vue";
 
@@ -108,21 +109,23 @@ function check(e: Event) {
 async function getTodoTemplate() {
   let todos: Row<"todo">[];
   template.value = [];
-  const { data, error } = await supabase
-    .from("todo")
-    .select()
-    .not("inactive", "eq", true)
-    .eq("category", "daily")
-    .order("order", { ascending: true });
-  if (error === null && data.length !== 0) {
-    todos = data.filter((d) => d.subtodo_of === null);
-    todos.forEach((t) => {
-      const subtodos = data.filter((d) => d.subtodo_of === t.id);
-      template.value.push({
-        ...t,
-        subtodos,
-      });
+
+  const { allTodos } = useStorageStore();
+  const req = allTodos
+    .filter((t) => t.inactive !== true && t.category === "daily")
+    .sort((a, b) => {
+      if (a.order! < b.order!) return -1;
+      else if (a.order! > b.order!) return 1;
+      return 0;
     });
-  }
+
+  todos = req.filter((d) => d.subtodo_of === null);
+  todos.forEach((t) => {
+    const subtodos = req.filter((d) => d.subtodo_of === t.id);
+    template.value.push({
+      ...t,
+      subtodos,
+    });
+  });
 }
 </script>

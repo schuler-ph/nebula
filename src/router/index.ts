@@ -38,6 +38,11 @@ const routes = [
         component: () => import("@/views/training/Exercises.vue"),
       },
       {
+        path: "training",
+        name: "Training",
+        component: () => import("@/views/training/Training.vue"),
+      },
+      {
         path: "todo/daily",
         name: "TodoDaily",
         component: () => import("@/views/diary/todo/TodoDaily.vue"),

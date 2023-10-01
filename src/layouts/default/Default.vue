@@ -58,7 +58,7 @@
       </v-container>
     </v-main>
 
-    <div v-if="trainingStatus" id="bottomTrainingBar">oifgohdf</div>
+    <TrainingBar v-if="trainingStatus" />
   </v-app>
 </template>
 
@@ -70,8 +70,10 @@ const { smAndDown, xs, md } = useDisplay();
 import nebulaLogo from "@/assets/logo.svg";
 import nebulaBg from "@/assets/bg/appBarNebula.jpg";
 import { usePlannerStore } from "@/store/plannerStore";
+import { storeToRefs } from "pinia";
+import TrainingBar from "@/components/menu/TrainingBar.vue";
 
-const { trainingStatus } = usePlannerStore();
+const { trainingStatus } = storeToRefs(usePlannerStore());
 
 const links = [
   {
@@ -88,14 +90,5 @@ const links = [
 <style scoped>
 .mainMarginBottomForTrainingBar {
   margin-bottom: 5rem;
-}
-#bottomTrainingBar {
-  bottom: 0;
-  left: 0;
-  display: block;
-  position: fixed;
-  width: 100%;
-  height: 5rem;
-  background-color: #3f51b5;
 }
 </style>

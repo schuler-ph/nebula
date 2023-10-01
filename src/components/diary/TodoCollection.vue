@@ -13,21 +13,19 @@
 import { useDiaryContent } from "@/hooks/useDiaryContent";
 import TodoInput from "./TodoInput.vue";
 import { onMounted } from "vue";
-import { supabase } from "@/lib/supabaseClient";
 import { useRoute } from "vue-router";
+import { useStorageStore } from "@/store/storageStore";
 
-const { todoDaily, todoTraining, showTodoTraining } = useDiaryContent();
+const { todoDaily } = useDiaryContent();
 
 onMounted(async () => {
   const { day } = useRoute().params;
-  const { data, error } = await supabase
-    .from("diary")
-    .select("todoDailyDone")
-    .eq("day", day);
-  if (error === null && data.length !== 0) {
-    todoDaily.value = data[0].todoDailyDone;
-    emit("update:todoDaily", todoDaily.value);
-  }
+
+  const { allEntrys } = useStorageStore();
+  const todoDailyDone = allEntrys.find((e) => e.day === day)?.todoDailyDone;
+
+  todoDaily.value = todoDailyDone!;
+  emit("update:todoDaily", todoDaily.value);
 });
 
 const emit = defineEmits(["update:todoDaily"]);

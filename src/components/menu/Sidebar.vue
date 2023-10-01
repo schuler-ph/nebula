@@ -104,6 +104,11 @@ const linksTraining = [
     to: "/training/exercises",
     icon: "mdi-pyramid",
   },
+  {
+    title: "Training",
+    to: "/training",
+    icon: "mdi-weight-lifter",
+  },
 ];
 
 const linksTodo = [

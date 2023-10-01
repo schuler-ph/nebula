@@ -22,11 +22,10 @@
       ></v-text-field>
     </v-container>
 
-    <ContentInputCollection
-      @update:content="(c) => (content = c)"
-      @update:contentUni="(c) => (contentUni = c)"
-      @update:contentTraining="(c) => (contentTraining = c)"
-      @update:contentProjects="(c) => (contentProjects = c)"
+    <ContentInput
+      title="Content"
+      v-model="content"
+      color="deep-purple-lighten-4"
     />
 
     <TodoCollection @update:todoDaily="(t) => (todoDaily = t)" />
@@ -114,7 +113,6 @@
 import { ref } from "vue";
 import { InsertDto, UpdateDto } from "@/types/supabaseHelper";
 import { getUserId, supabase } from "@/lib/supabaseClient";
-import ContentInputCollection from "@/components/diary/ContentInputCollection.vue";
 import CustomSnackbar from "@/components/generic/CustomSnackbar.vue";
 import router from "@/router";
 import { useRoute } from "vue-router";
@@ -123,74 +121,66 @@ import { useSnackbar } from "@/hooks/useSnackbar";
 import { useDiaryContent } from "@/hooks/useDiaryContent";
 import TodoCollection from "@/components/diary/TodoCollection.vue";
 import { useDisplay } from "vuetify";
+import ContentInput from "@/components/diary/ContentInput.vue";
+import { useStorageStore } from "@/store/storageStore";
 const { smAndUp } = useDisplay();
 
 const { day } = useRoute().params;
 const currentTime = new Date().toUTCString();
 const modifiedTime = ref<Date>();
 
-const {
-  date,
-  title,
-  content,
-  contentUni,
-  contentTraining,
-  contentProjects,
-  todoDaily,
-  currentWeight,
-  weightSlider,
-} = useDiaryContent();
+const { date, title, content, todoDaily, currentWeight, weightSlider } =
+  useDiaryContent();
 const { snackbarOpen, snackbarText, snackbarColor, newSnackbarMessage } =
   useSnackbar();
 const cancelDialog = ref(false);
 let oldEntry: UpdateDto<"diary">;
 
+const { allEntrys } = useStorageStore();
+
 onMounted(async () => {
-  const { data, error } = await supabase.from("diary").select().eq("day", day);
-  if (error === null) {
-    if (data.length !== 0) {
-      title.value = data[0].title!;
-      currentWeight.value = data[0].currentWeight!;
-      modifiedTime.value = new Date(data[0].last_modified!);
+  const entry = allEntrys.find((e) => e.day === day);
 
-      if (currentWeight.value) {
-        weightSlider.value = currentWeight.value;
-      }
+  if (entry !== undefined) {
+    // day found
+    title.value = entry.title!;
+    content.value = entry.content!;
+    currentWeight.value = entry.currentWeight!;
+    modifiedTime.value = new Date(entry.last_modified!);
 
-      oldEntry = {
-        title: data[0].title,
-        content: data[0].content,
-        // TODO
-        todoDailyDone: data[0].todoDailyDone,
-        currentWeight: data[0].currentWeight,
-        last_modified: currentTime,
-      };
-    } else {
-      const tempDate = new Date(day as string);
-      title.value = tempDate.getWeekDayName() + tempDate.getWeek();
-      currentWeight.value = null;
-      const entry: InsertDto<"diary"> = {
-        day: day as string,
-        user_id: await getUserId(),
-        title: title.value,
-        content: "",
-        // TODO
-      };
-      oldEntry = currentEntry();
-      const { error } = await supabase.from("diary").insert(entry);
-
-      if (error === null) {
-        newSnackbarMessage("New entry created!", "info");
-      } else {
-        newSnackbarMessage(
-          "This date doesn't exist and couldn't be created!",
-          "error"
-        );
-      }
+    if (currentWeight.value) {
+      weightSlider.value = currentWeight.value;
     }
+
+    oldEntry = {
+      title: entry.title,
+      content: entry.content,
+      todoDailyDone: entry.todoDailyDone,
+      currentWeight: entry.currentWeight,
+      last_modified: currentTime,
+    };
   } else {
-    console.log("SELECT ERROR", error);
-    newSnackbarMessage(error.message, "error");
+    // day not found
+    const tempDate = new Date(day as string);
+    title.value = tempDate.getWeekDayName() + tempDate.getWeek();
+    currentWeight.value = null;
+    const entry: InsertDto<"diary"> = {
+      day: day as string,
+      user_id: await getUserId(),
+      title: title.value,
+      content: "",
+    };
+    oldEntry = currentEntry();
+    const { error } = await supabase.from("diary").insert(entry);
+
+    if (error === null) {
+      newSnackbarMessage("New entry created!", "info");
+    } else {
+      newSnackbarMessage(
+        "This date doesn't exist and couldn't be created!",
+        "error"
+      );
+    }
   }
 });
 

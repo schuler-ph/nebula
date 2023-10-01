@@ -4,18 +4,8 @@ export function useDiaryContent() {
   const date = ref([new Date()]);
   const title = ref("");
   const content = ref("");
-  const contentUni = ref("");
-  const contentTraining = ref("");
-  const contentProjects = ref("");
-
-  const showContentUni = ref(false);
-  const showContentTraining = ref(false);
-  const showContentProjects = ref(false);
 
   const todoDaily = ref<string[]>([]);
-  const todoTraining = ref({});
-
-  const showTodoTraining = ref(false);
 
   const currentWeight = ref<number | null>(0.0);
   const weightSlider = ref(0.0);
@@ -24,15 +14,7 @@ export function useDiaryContent() {
     date,
     title,
     content,
-    contentUni,
-    contentTraining,
-    contentProjects,
-    showContentUni,
-    showContentTraining,
-    showContentProjects,
     todoDaily,
-    todoTraining,
-    showTodoTraining,
     currentWeight,
     weightSlider,
   };
