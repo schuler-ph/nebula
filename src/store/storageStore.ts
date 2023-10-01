@@ -11,19 +11,31 @@ export const useStorageStore = defineStore("storage", {
   }),
   actions: {
     async initEx() {
-      const { data, error } = await supabase.from("exercise").select();
+      const { data, error } = await supabase
+        .from("exercise")
+        .select()
+        .order("category")
+        .order("isSkill", { ascending: false })
+        .order("subCategory")
+        .order("name");
       if (error === null && data.length !== 0) {
         this.allExercises = data;
       }
     },
     async initSplits() {
-      const { data, error } = await supabase.from("split").select();
+      const { data, error } = await supabase
+        .from("split")
+        .select()
+        .order("index", { ascending: true });
       if (error === null && data.length !== 0) {
         this.allSplits = data;
       }
     },
     async initDiary() {
-      const { data, error } = await supabase.from("diary").select();
+      const { data, error } = await supabase
+        .from("diary")
+        .select()
+        .order("day", { ascending: false });
       if (error === null && data.length !== 0) {
         this.allEntrys = data;
       }

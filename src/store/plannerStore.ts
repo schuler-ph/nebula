@@ -1,6 +1,7 @@
 import { supabase } from "@/lib/supabaseClient";
 import { Row } from "@/types/supabaseHelper";
 import { defineStore } from "pinia";
+import { useStorageStore } from "./storageStore";
 
 export const usePlannerStore = defineStore("planner", {
   state: () => ({
@@ -23,17 +24,13 @@ export const usePlannerStore = defineStore("planner", {
     },
     start_training(split: Row<"split">) {
       if (split) {
+        this.splitExercises = [];
         this.trainingStarted = new Date();
         this.trainingSplit = split.name;
 
-        split.exercises.forEach(async (e) => {
-          const { data, error } = await supabase
-            .from("exercise")
-            .select()
-            .eq("id", e);
-          if (error === null && data.length !== 0) {
-            this.splitExercises.push(data[0]);
-          }
+        split.exercises.forEach((e) => {
+          const { allExercises } = useStorageStore();
+          this.splitExercises.push(allExercises.find((ae) => ae.id === e)!);
         });
 
         this.currentExercise = 0;

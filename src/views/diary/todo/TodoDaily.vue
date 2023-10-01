@@ -73,34 +73,43 @@ import { onMounted } from "vue";
 import { capFirst } from "@/helper/stringHelper";
 import CustomDialog from "@/components/generic/CustomDialog.vue";
 import { useDisplay } from "vuetify";
+import { useStorageStore } from "@/store/storageStore";
 const { smAndDown } = useDisplay();
 
 const template = ref<TodoTemplate[]>([]);
 type TodoTemplate = Row<"todo"> & { subtodos?: Row<"todo">[] };
 const newSubText = ref("");
 
-onMounted(async () => {
-  await getTodoTemplate();
+onMounted(() => {
+  alignTodos();
 });
+const { allTodos, initTodos } = useStorageStore();
 
-async function getTodoTemplate() {
+function alignTodos() {
   let todos: Row<"todo">[];
   template.value = [];
-  const { data, error } = await supabase
-    .from("todo")
-    .select()
-    .eq("category", "daily")
-    .order("order", { ascending: true });
-  if (error === null && data.length !== 0) {
-    todos = data.filter((d) => d.subtodo_of === null);
-    todos.forEach((t) => {
-      const subtodos = data.filter((d) => d.subtodo_of === t.id);
-      template.value.push({
-        ...t,
-        subtodos,
-      });
+
+  const req = allTodos
+    .filter((at) => at.category === "daily")
+    .sort((a, b) => {
+      if (a.order! < b.order!) return 1;
+      else if (a.order! > b.order!) return -1;
+      return 0;
     });
-  }
+
+  todos = req.filter((d) => d.subtodo_of === null);
+  todos.forEach((t) => {
+    const subtodos = req.filter((d) => d.subtodo_of === t.id);
+    template.value.push({
+      ...t,
+      subtodos,
+    });
+  });
+}
+
+async function getTodoTemplate() {
+  await initTodos();
+  alignTodos();
 }
 
 function check(e: Event) {

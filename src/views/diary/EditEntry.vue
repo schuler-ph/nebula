@@ -230,18 +230,10 @@ function cancelUpdate() {
   }
 }
 
-async function getLatestWeight() {
-  const { data, error } = await supabase
-    .from("diary")
-    .select("currentWeight")
-    .not("currentWeight", "is", null)
-    .order("day", { ascending: false })
-    .limit(1);
-
-  if (error === null && data.length !== 0) {
-    currentWeight.value = data[0].currentWeight!;
-    centerSlider("force");
-  }
+function getLatestWeight() {
+  const req = allEntrys.filter((ae) => ae.currentWeight !== null);
+  currentWeight.value = req[0].currentWeight;
+  centerSlider("force");
 }
 
 function centerSlider(a: string) {

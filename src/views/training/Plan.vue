@@ -59,6 +59,7 @@ import { supabase } from "@/lib/supabaseClient";
 import { Row } from "@/types/supabaseHelper";
 import router from "@/router";
 import { usePlannerStore } from "@/store/plannerStore";
+import { useStorageStore } from "@/store/storageStore";
 
 const { weekOffset, increment, decrement, reset } = usePlannerStore();
 const { smAndUp } = useDisplay();
@@ -93,7 +94,7 @@ function nextWeek() {
   });
 }
 
-async function initiateWeekdays() {
+function initiateWeekdays() {
   weekdays.value = [];
 
   const weekdayNames: string[] = [
@@ -128,32 +129,32 @@ async function initiateWeekdays() {
     );
   }
 
-  weekdays.value.forEach(async (wd) => {
-    await wd.setup();
+  weekdays.value.forEach((wd) => {
+    wd.setup();
   });
 }
 
-onMounted(async () => {
-  await initiateWeekdays();
+onMounted(() => {
+  initiateWeekdays();
 
-  const { data, error } = await supabase
-    .from("todo")
-    .select()
-    .not("inactive", "eq", true)
-    .eq("category", "daily")
-    .order("order", { ascending: true });
-
-  if (error === null && data.length !== 0) {
-    let todos: Row<"todo">[];
-    template.value = [];
-    todos = data.filter((d) => d.subtodo_of === null);
-    todos.forEach((t) => {
-      const subtodos = data.filter((d) => d.subtodo_of === t.id);
-      template.value.push({
-        ...t,
-        subtodos,
-      });
+  const { allTodos } = useStorageStore();
+  const req = allTodos
+    .filter((t) => t.inactive !== true && t.category === "daily")
+    .sort((a, b) => {
+      if (a.order! < b.order!) return -1;
+      else if (a.order! > b.order!) return 1;
+      return 0;
     });
-  }
+
+  let todos: Row<"todo">[];
+  template.value = [];
+  todos = req.filter((d) => d.subtodo_of === null);
+  todos.forEach((t) => {
+    const subtodos = req.filter((d) => d.subtodo_of === t.id);
+    template.value.push({
+      ...t,
+      subtodos,
+    });
+  });
 });
 </script>

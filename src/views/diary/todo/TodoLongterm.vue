@@ -119,6 +119,7 @@ import CustomDialog from "@/components/generic/CustomDialog.vue";
 import CustomSnackbar from "@/components/generic/CustomSnackbar.vue";
 import { useDisplay } from "vuetify";
 import { useSnackbar } from "@/hooks/useSnackbar";
+import { useStorageStore } from "@/store/storageStore";
 const { smAndDown } = useDisplay();
 const { snackbarOpen, snackbarText, snackbarColor, newSnackbarMessage } =
   useSnackbar();
@@ -174,28 +175,35 @@ const submitEditTodo = async () => {
   await getTodoTemplate();
 };
 
-onMounted(async () => {
-  await getTodoTemplate();
+onMounted(() => {
+  alignTodos();
 });
+const { allTodos, initTodos } = useStorageStore();
 
-async function getTodoTemplate() {
+const alignTodos = () => {
   let todos: Row<"todo">[];
   template.value = [];
-  const { data, error } = await supabase
-    .from("todo")
-    .select()
-    .eq("category", "longterm")
-    .order("updated_at", { ascending: false });
-  if (error === null && data.length !== 0) {
-    todos = data.filter((d) => d.subtodo_of === null);
-    todos.forEach((t) => {
-      const subtodos = data.filter((d) => d.subtodo_of === t.id);
-      template.value.push({
-        ...t,
-        subtodos,
-      });
+  const req = allTodos
+    .filter((at) => at.category === "longterm")
+    .sort((a, b) => {
+      if (a.updated_at > b.updated_at) return 1;
+      else if (a.updated_at < b.updated_at) return -1;
+      return 0;
     });
-  }
+
+  todos = req.filter((d) => d.subtodo_of === null);
+  todos.forEach((t) => {
+    const subtodos = req.filter((d) => d.subtodo_of === t.id);
+    template.value.push({
+      ...t,
+      subtodos,
+    });
+  });
+};
+
+async function getTodoTemplate() {
+  await initTodos();
+  alignTodos();
 }
 
 async function addNewTodo(parent?: string) {

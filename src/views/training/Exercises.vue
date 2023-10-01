@@ -83,29 +83,30 @@ import ExercisesCategoryOverview from "@/components/training/ExercisesCategoryOv
 import CustomDialog from "@/components/generic/CustomDialog.vue";
 import { useDisplay } from "vuetify/lib/framework.mjs";
 import { capFirst } from "@/helper/stringHelper";
+import { useStorageStore } from "@/store/storageStore";
 const { xs } = useDisplay();
+
+const { allExercises, initEx } = useStorageStore();
 
 const exercisesPush = ref<Row<"exercise">[]>();
 const exercisesPull = ref<Row<"exercise">[]>();
 const exercisesLegs = ref<Row<"exercise">[]>();
 const exercisesCore = ref<Row<"exercise">[]>();
 
-onMounted(async () => {
-  await getExercises();
+onMounted(() => {
+  assignExercises();
 });
 
 const getExercises = async () => {
-  const { data, error } = await supabase
-    .from("exercise")
-    .select()
-    .order("subCategory")
-    .order("name", { ascending: true });
-  if (error === null && data.length !== 0) {
-    exercisesPush.value = data.filter((d) => d.category === "Push");
-    exercisesPull.value = data.filter((d) => d.category === "Pull");
-    exercisesLegs.value = data.filter((d) => d.category === "Legs");
-    exercisesCore.value = data.filter((d) => d.category === "Core");
-  }
+  await initEx();
+  assignExercises();
+};
+
+const assignExercises = () => {
+  exercisesPush.value = allExercises.filter((d) => d.category === "Push");
+  exercisesPull.value = allExercises.filter((d) => d.category === "Pull");
+  exercisesLegs.value = allExercises.filter((d) => d.category === "Legs");
+  exercisesCore.value = allExercises.filter((d) => d.category === "Core");
 };
 
 const tempDialogOpen = ref(false);
@@ -121,6 +122,7 @@ const categories = [
   { name: "Legs", exercises: exercisesLegs },
   { name: "Core", exercises: exercisesCore },
 ];
+
 const subCategories = [
   { name: "Horizontal", val: "H" },
   { name: "Vertical", val: "V" },

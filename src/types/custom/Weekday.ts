@@ -1,6 +1,6 @@
 import { getDayOfCurrentWeek, dateToIsoString } from "@/helper/dateHelper";
 import { Row } from "../supabaseHelper";
-import { supabase } from "@/lib/supabaseClient";
+import { useStorageStore } from "@/store/storageStore";
 
 export default class Weekday {
   index: number;
@@ -18,18 +18,19 @@ export default class Weekday {
     this.contentLength = 0;
   }
 
-  async setup() {
-    this.instance = await this.getWeekdayEntry();
+  setup() {
+    this.instance = this.getWeekdayEntry();
   }
 
-  async getWeekdayEntry() {
-    const { data, error } = await supabase
-      .from("diary")
-      .select()
-      .eq("day", dateToIsoString(this.date));
-    if (error === null && data.length !== 0) {
-      this.contentLength = this.getFullContentLength(data[0]);
-      return data[0];
+  getWeekdayEntry() {
+    const { allEntrys } = useStorageStore();
+    const wdEntry = allEntrys.find(
+      (ae) => ae.day === dateToIsoString(this.date)
+    );
+
+    if (wdEntry) {
+      this.contentLength = this.getFullContentLength(wdEntry);
+      return wdEntry;
     } else {
       this.contentLength = 0;
       return undefined;

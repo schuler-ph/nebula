@@ -6,6 +6,7 @@
     <div class="mr-5">{{ trainingSplit }}</div>
     <div class="mr-5">{{ currentExercise }}</div>
     <div class="mr-5">{{ splitExercises[currentExercise]?.name }}</div>
+    <br />
     <v-btn @click="() => prev_exercise()">pre</v-btn>
     <v-btn @click="() => next_exercise()">nxt</v-btn>
   </div>
@@ -20,21 +21,24 @@ import {
   differenceInHours,
 } from "date-fns";
 import { storeToRefs } from "pinia";
-const { trainingStarted, trainingSplit, currentExercise, splitExercises } =
-  storeToRefs(usePlannerStore());
+const { trainingSplit, currentExercise, splitExercises } = storeToRefs(
+  usePlannerStore()
+);
 
-const { prev_exercise, next_exercise } = usePlannerStore();
+const { prev_exercise, next_exercise, trainingStarted } = usePlannerStore();
 
 const hrs = ref(0);
 const min = ref(0);
 const sec = ref(0);
 
+const tstart = new Date(trainingStarted!);
+
 onMounted(() => {
   setInterval(() => {
     const currentTime = new Date();
-    hrs.value = differenceInHours(currentTime, trainingStarted.value!);
-    min.value = differenceInMinutes(currentTime, trainingStarted.value!);
-    sec.value = differenceInSeconds(currentTime, trainingStarted.value!);
+    hrs.value = differenceInHours(currentTime, tstart);
+    min.value = differenceInMinutes(currentTime, tstart);
+    sec.value = differenceInSeconds(currentTime, tstart);
   }, 1000);
 });
 
@@ -71,5 +75,6 @@ const formatTime = () => {
   height: 5rem;
   border-top: 1px solid black;
   background-color: white;
+  z-index: 1000;
 }
 </style>

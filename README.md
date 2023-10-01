@@ -1,6 +1,7 @@
 # Nebula
+
 <p align="center">
-<img src="src/assets/logo.svg" alt="Logo" width="100" height="100"> 
+<img src="src/assets/logo.svg" alt="Logo" width="100" height="100">
   <h3 align="center">Nebula</h3>
   <p align="center">
     My personal diary
@@ -11,22 +12,30 @@
 
 ## Description
 
-My private diary app. I use it to write down a few paragraphs for different subjects (general, training, university, projects) and plan my week.
+I created Nebula to keep track of things that are important to me. So far, I have implemented a diary (write down a few memories every day) and a habit tracker (a.k.a. daily todos).
+
+I am currently developing a workout planner (for calisthenics athletes & gym rats).
+
+Future updates will bring a meal planner (calculate your kcal & macro goals) and diary entry collections (save important events in your calendar).
 
 ## Hosted Application
 
 The application is already usable through netlify under <a href="https://magnificent-rugelach-0a7290.netlify.app/">this link</a>.
-You cannot sign up for an account yet. If you are interested in testing the application, send me an email to schulerp03+nebula@gmail.com.
+You cannot sign up for an account yet.
 
 ## Features
+
 ### Diary
-* Write diary entrys for various subjects
+
+- Write diary entrys for various subjects
 
 ### Todos
-* Create Daily Todos (Habits) and record how you perform every day
-* Create One-Time Todos
+
+- Create Daily Todos (Habits) and record how you perform every day
+- Create One-Time Todos
 
 ### Training plan
-* Create exercises (skills or basics)
-* Create a training plan with these exercises
-* Assign a training plan to your week
+
+- Create exercises (skills or basics)
+- Create a training plan with these exercises
+- Assign a training plan to your week

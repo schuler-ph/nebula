@@ -15,20 +15,15 @@ import { usePlannerStore } from "@/store/plannerStore";
 import { supabase } from "@/lib/supabaseClient";
 import { onMounted, ref } from "vue";
 import { Row } from "@/types/supabaseHelper";
+import { useStorageStore } from "@/store/storageStore";
 
 const splits = ref<Row<"split">[]>();
 const selectedSplit = ref<Row<"split">>();
 
-onMounted(async () => {
-  const { data, error } = await supabase
-    .from("split")
-    .select()
-    .order("index", { ascending: true });
-  if (error === null && data.length !== 0) {
-    splits.value = data;
-  } else {
-    console.log(error);
-  }
+const { allSplits } = useStorageStore();
+
+onMounted(() => {
+  splits.value = allSplits;
 });
 
 const { start_training, end_training } = usePlannerStore();
