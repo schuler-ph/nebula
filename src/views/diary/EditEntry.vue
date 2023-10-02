@@ -22,11 +22,20 @@
       ></v-text-field>
     </v-container>
 
-    <ContentInput
-      title="Content"
-      v-model="content"
-      color="deep-purple-lighten-4"
-    />
+    <v-col cols="12" class="mb-2">
+      <v-sheet class="bg-deep-purple-lighten-4 ma-1" height="100%" rounded="lg">
+        <v-textarea
+          v-model="content"
+          :label="title"
+          class="pa-2"
+          variant="solo-filled"
+          no-resize
+          counter
+          persistent-counter
+        >
+        </v-textarea>
+      </v-sheet>
+    </v-col>
 
     <TodoCollection @update:todoDaily="(t) => (todoDaily = t)" />
 
@@ -121,7 +130,6 @@ import { useSnackbar } from "@/hooks/useSnackbar";
 import { useDiaryContent } from "@/hooks/useDiaryContent";
 import TodoCollection from "@/components/diary/TodoCollection.vue";
 import { useDisplay } from "vuetify";
-import ContentInput from "@/components/diary/ContentInput.vue";
 import { useStorageStore } from "@/store/storageStore";
 const { smAndUp } = useDisplay();
 
@@ -136,7 +144,7 @@ const { snackbarOpen, snackbarText, snackbarColor, newSnackbarMessage } =
 const cancelDialog = ref(false);
 let oldEntry: UpdateDto<"diary">;
 
-const { allEntrys } = useStorageStore();
+const { allEntrys, initDiarySingle } = useStorageStore();
 
 onMounted(async () => {
   const entry = allEntrys.find((e) => e.day === day);
@@ -206,17 +214,21 @@ async function submitUpdate() {
       .update(currentEntry())
       .eq("day", day);
 
-    if (error === null) {
-      router.push({ name: "Home" });
-    } else {
-      if (error.code === "23505") {
-        // just as template
-        // newSnackbarMessage("You already created an entry for this day!", "error");
+    await initDiarySingle();
+
+    setTimeout(() => {
+      if (error === null) {
+        router.push({ name: "Home" });
       } else {
-        console.log("UPDATE ERROR", error);
-        newSnackbarMessage(error.message, "error");
+        if (error.code === "23505") {
+          // just as template
+          // newSnackbarMessage("You already created an entry for this day!", "error");
+        } else {
+          console.log("UPDATE ERROR", error);
+          newSnackbarMessage(error.message, "error");
+        }
       }
-    }
+    }, 200);
   } else {
     router.push({ name: "Home" });
   }

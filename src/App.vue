@@ -1,6 +1,6 @@
 <template>
   <div
-    v-if="loading"
+    v-if="loadingData"
     class="d-flex justify-center align-center w-screen h-screen"
   >
     <div class="loadingio-spinner-eclipse-ui0s8haubu">
@@ -9,6 +9,7 @@
       </div>
     </div>
   </div>
+  <!-- <div v-else>oida</div> -->
   <router-view v-else />
 </template>
 
@@ -16,25 +17,16 @@
 import { onBeforeMount, ref } from "vue";
 import useAuth from "@/hooks/useAuth";
 import { useStorageStore } from "./store/storageStore";
+import { storeToRefs } from "pinia";
 
-const loading = ref(true);
-const { initEx, initDiary, initSplits, initTodos } = useStorageStore();
+const { loadingData } = storeToRefs(useStorageStore());
+const { initAll } = useStorageStore();
 
 onBeforeMount(async () => {
-  loading.value = true;
-  const { login, initAuth, logout } = useAuth();
+  const { initAuth } = useAuth();
   initAuth();
-  initSession().then(() => {
-    loading.value = false;
-  });
+  await initAll();
 });
-
-const initSession = async () => {
-  await initEx();
-  await initDiary();
-  await initSplits();
-  await initTodos();
-};
 </script>
 
 <style type="text/css">

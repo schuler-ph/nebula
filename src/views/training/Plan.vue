@@ -20,7 +20,7 @@
         <v-btn
           v-if="weekdays[0] !== undefined"
           class="mx-3 text-h6 font-weight-black"
-          @click="() => resetWeek()"
+          @click="() => currentWeek()"
           :color="
             weekdays[0].date.getWeek() === currentDate.getWeek()
               ? 'transparent'
@@ -44,117 +44,24 @@
         ></v-btn>
       </v-sheet>
     </v-sheet>
-    <SplitDay v-for="wd in weekdays" :wd="wd" :activeDailyTodos="template" />
+    <SplitDay v-for="wd in weekdays" :wd="wd" />
   </v-sheet>
 </template>
 
 <script setup lang="ts">
 import SplitDay from "@/components/training/SplitDay.vue";
-import { ref } from "vue";
-import { getWeekIsoDates } from "@/helper/dateHelper";
 import { onMounted } from "vue";
-import Weekday from "@/types/custom/Weekday";
 import { useDisplay } from "vuetify";
-import { supabase } from "@/lib/supabaseClient";
-import { Row } from "@/types/supabaseHelper";
-import router from "@/router";
 import { usePlannerStore } from "@/store/plannerStore";
-import { useStorageStore } from "@/store/storageStore";
+import { storeToRefs } from "pinia";
 
-const { weekOffset, increment, decrement, reset } = usePlannerStore();
+const { weekdays } = storeToRefs(usePlannerStore());
+const { nextWeek, prevWeek, currentWeek, initiateWeekdays } = usePlannerStore();
 const { smAndUp } = useDisplay();
 
-const weekdays = ref<Weekday[]>([]);
-const template = ref<TodoTemplate[]>([]);
-type TodoTemplate = Row<"todo"> & { subtodos?: Row<"todo">[] };
 const currentDate = new Date();
-
-function prevWeek() {
-  decrement();
-  weekdays.value.forEach((wd) => {
-    wd.date = new Date(wd.date.setDate(wd.date.getDate() - 7));
-    wd.setup();
-  });
-}
-
-function resetWeek() {
-  reset();
-  const weekDates = getWeekIsoDates(0);
-  weekdays.value.forEach((wd, index) => {
-    wd.date = new Date(weekDates[index]);
-    wd.setup();
-  });
-}
-
-function nextWeek() {
-  increment();
-  weekdays.value.forEach((wd) => {
-    wd.date = new Date(wd.date.setDate(wd.date.getDate() + 7));
-    wd.setup();
-  });
-}
-
-function initiateWeekdays() {
-  weekdays.value = [];
-
-  const weekdayNames: string[] = [
-    "Monday",
-    "Tuesday",
-    "Wednesday",
-    "Thursday",
-    "Friday",
-    "Saturday",
-    "Sunday",
-  ];
-  const colors: string[] = [
-    "#673ab7",
-    "#603eb6",
-    "#5a42b6",
-    "#5346b6",
-    "#4c4ab6",
-    "#454eb5",
-    "#3f51b5",
-  ];
-
-  const weekDates = getWeekIsoDates(weekOffset);
-
-  for (let i = 1; i <= 7; i++) {
-    weekdays.value.push(
-      new Weekday(
-        i,
-        weekdayNames[i - 1],
-        colors[i - 1],
-        new Date(weekDates[i - 1])
-      )
-    );
-  }
-
-  weekdays.value.forEach((wd) => {
-    wd.setup();
-  });
-}
 
 onMounted(() => {
   initiateWeekdays();
-
-  const { allTodos } = useStorageStore();
-  const req = allTodos
-    .filter((t) => t.inactive !== true && t.category === "daily")
-    .sort((a, b) => {
-      if (a.order! < b.order!) return -1;
-      else if (a.order! > b.order!) return 1;
-      return 0;
-    });
-
-  let todos: Row<"todo">[];
-  template.value = [];
-  todos = req.filter((d) => d.subtodo_of === null);
-  todos.forEach((t) => {
-    const subtodos = req.filter((d) => d.subtodo_of === t.id);
-    template.value.push({
-      ...t,
-      subtodos,
-    });
-  });
 });
 </script>

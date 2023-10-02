@@ -25,19 +25,19 @@
         {{ dateToIsoString(wd.date) }}</v-btn
       ></v-row
     >
-    <v-row v-if="wd.instance && activeDailyTodos" class="my-2">
+    <v-row v-if="wd.contentLength !== 0" class="my-2">
       <v-btn
         prepend-icon="mdi-book-open-variant"
         class="mr-2"
         color="deep-purple-lighten-1"
-        >{{ wd.instance.content!.length }}</v-btn
+        >{{ wd.contentLength }}</v-btn
       >
       <v-btn
         prepend-icon="mdi-checkbox-marked-circle-outline"
         color="deep-purple-lighten-1"
       >
-        {{ doneSubTodos(activeDailyTodos) }} /
-        {{ totalSubTodos(activeDailyTodos) }}
+        {{ wd.doneSubTodos }} /
+        {{ totalSubTodos }}
       </v-btn>
     </v-row>
   </v-sheet>
@@ -45,42 +45,13 @@
 
 <script setup lang="ts">
 import { dateToIsoString } from "@/helper/dateHelper";
-import Weekday from "@/types/custom/Weekday";
-import { Row } from "@/types/supabaseHelper";
+import { Weekday, usePlannerStore } from "@/store/plannerStore";
 import { useDisplay } from "vuetify";
 const { xs } = useDisplay();
 
-type TodoTemplate = Row<"todo"> & { subtodos?: Row<"todo">[] };
+const { totalSubTodos } = usePlannerStore();
 
-const { activeDailyTodos, wd } = defineProps({
-  wd: {
-    required: true,
-    type: Weekday,
-  },
-  activeDailyTodos: {
-    type: Array<TodoTemplate>,
-  },
-});
-
-const totalSubTodos = (adt: Array<TodoTemplate>) => {
-  let num = 0;
-
-  adt!.forEach((a) => {
-    num += a.subtodos!.length;
-  });
-
-  return num;
-};
-
-const doneSubTodos = (adt: Array<TodoTemplate>) => {
-  let num = 0;
-
-  adt!.forEach((todo) => {
-    num += wd.instance!.todoDailyDone.filter((i1) =>
-      todo.subtodos?.some((i2) => i2.id === i1)
-    ).length;
-  });
-
-  return num;
-};
+const { wd } = defineProps<{
+  wd: Weekday;
+}>();
 </script>

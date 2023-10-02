@@ -86,19 +86,19 @@ import { capFirst } from "@/helper/stringHelper";
 import { useStorageStore } from "@/store/storageStore";
 const { xs } = useDisplay();
 
-const { allExercises, initEx } = useStorageStore();
+const { allExercises, initExSingle } = useStorageStore();
 
-const exercisesPush = ref<Row<"exercise">[]>();
-const exercisesPull = ref<Row<"exercise">[]>();
-const exercisesLegs = ref<Row<"exercise">[]>();
-const exercisesCore = ref<Row<"exercise">[]>();
+const exercisesPush = ref<Row<"exercise">[]>([]);
+const exercisesPull = ref<Row<"exercise">[]>([]);
+const exercisesLegs = ref<Row<"exercise">[]>([]);
+const exercisesCore = ref<Row<"exercise">[]>([]);
 
 onMounted(() => {
   assignExercises();
 });
 
 const getExercises = async () => {
-  await initEx();
+  await initExSingle();
   assignExercises();
 };
 

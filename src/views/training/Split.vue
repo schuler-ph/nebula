@@ -9,8 +9,11 @@
       class="mb-3"
       @update:model-value="
         (mv) => {
-          selectedCategories = allSplits.find((s) => s.id === mv)?.categories!;
-          selectedExercises = allSplits.find((s) => s.id === mv)?.exercises!;
+          const sp = allSplits.find((s) => s.id === mv);
+          if (sp) {
+            selectedCategories = sp.categories;
+            selectedExercises = sp.exercises;
+          }
           getExercisesBySelCat();
         }
       "

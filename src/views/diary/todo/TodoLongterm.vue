@@ -2,15 +2,15 @@
   <v-sheet rounded="lg" class="pa-5">
     <v-label>New Todo Name</v-label>
     <v-text-field
-      v-model="newSubText"
+      v-model="newTodoText"
       variant="solo"
-      ref="newTodoInput"
+      ref="textFieldRef"
     ></v-text-field>
     <div class="d-flex justify-center">
-      <v-btn @click="addNewTodo()" class="mb-3"> New Todo </v-btn>
+      <v-btn @click="() => addNewTodo(null)" class="mb-3"> New Todo </v-btn>
     </div>
     <v-expansion-panels>
-      <v-expansion-panel v-for="todo in template">
+      <v-expansion-panel v-for="todo in ltTodos">
         <v-expansion-panel-title class="text-h5">
           <v-btn
             :color="todo.done ? 'secondary' : 'primary'"
@@ -20,7 +20,7 @@
             @click="
               () => {
                 editTodoId = todo.id;
-                editTodo();
+                openEditDialog();
               }
             "
             @click.native="check($event)"
@@ -30,7 +30,7 @@
         </v-expansion-panel-title>
         <v-expansion-panel-text>
           <div class="d-flex justify-center mt-1 mb-3">
-            <v-btn @click="addNewTodo(todo.id)"> New Subtodo </v-btn>
+            <v-btn @click="() => addNewTodo(todo.id)"> New Subtodo </v-btn>
           </div>
           <v-divider class="mb-5" :thickness="2"></v-divider>
           <v-sheet
@@ -45,7 +45,7 @@
               @click="
                 () => {
                   editTodoId = sub.id;
-                  editTodo();
+                  openEditDialog();
                 }
               "
             >
@@ -120,39 +120,31 @@ import CustomSnackbar from "@/components/generic/CustomSnackbar.vue";
 import { useDisplay } from "vuetify";
 import { useSnackbar } from "@/hooks/useSnackbar";
 import { useStorageStore } from "@/store/storageStore";
+import { getLongtermTodos } from "@/store/storage/todos";
 const { smAndDown } = useDisplay();
 const { snackbarOpen, snackbarText, snackbarColor, newSnackbarMessage } =
   useSnackbar();
 
-const template = ref<TodoTemplate[]>([]);
-type TodoTemplate = Row<"todo"> & { subtodos?: Row<"todo">[] };
-const newSubText = ref("");
-const newTodoInput = ref();
+const newTodoText = ref("");
+const textFieldRef = ref();
 
 const editTodoDialogOpen = ref(false);
 const editTodoId = ref<string>();
 const editTodoText = ref("");
 const editTodoTime = ref<Date>();
 const editTodoStatus = ref(false);
-const editTodo = () => {
-  template.value.forEach((t) => {
-    if (t.id === editTodoId.value) {
-      editTodoText.value = t.name;
-      editTodoStatus.value = !t.done;
-      editTodoTime.value = new Date();
-    } else {
-      t.subtodos?.forEach((s) => {
-        if (s.id === editTodoId.value) {
-          editTodoText.value = s.name;
-          editTodoStatus.value = !s.done;
-          editTodoTime.value = new Date();
-        }
-      });
-    }
-  });
 
-  editTodoDialogOpen.value = true;
+const openEditDialog = () => {
+  const { allTodos } = useStorageStore();
+  const todoToEdit = allTodos.find((at) => at.id === editTodoId.value);
+  if (todoToEdit) {
+    editTodoText.value = todoToEdit.name;
+    editTodoStatus.value = todoToEdit.done;
+    editTodoTime.value = new Date();
+    editTodoDialogOpen.value = true;
+  }
 };
+
 const deleteTodo = async () => {
   editTodoDialogOpen.value = false;
   const { error } = await supabase
@@ -161,7 +153,6 @@ const deleteTodo = async () => {
     .eq("id", editTodoId.value);
   await getTodoTemplate();
 };
-
 const submitEditTodo = async () => {
   editTodoDialogOpen.value = false;
   await supabase
@@ -175,52 +166,38 @@ const submitEditTodo = async () => {
   await getTodoTemplate();
 };
 
+const ltTodos = ref();
+
 onMounted(() => {
   alignTodos();
 });
-const { allTodos, initTodos } = useStorageStore();
+
+const { initTodosSingle } = useStorageStore();
 
 const alignTodos = () => {
-  let todos: Row<"todo">[];
-  template.value = [];
-  const req = allTodos
-    .filter((at) => at.category === "longterm")
-    .sort((a, b) => {
-      if (a.updated_at > b.updated_at) return 1;
-      else if (a.updated_at < b.updated_at) return -1;
-      return 0;
-    });
-
-  todos = req.filter((d) => d.subtodo_of === null);
-  todos.forEach((t) => {
-    const subtodos = req.filter((d) => d.subtodo_of === t.id);
-    template.value.push({
-      ...t,
-      subtodos,
-    });
-  });
+  ltTodos.value = getLongtermTodos();
 };
 
 async function getTodoTemplate() {
-  await initTodos();
+  await initTodosSingle();
   alignTodos();
 }
 
-async function addNewTodo(parent?: string) {
-  if (newSubText.value !== "") {
+async function addNewTodo(parent: string | null) {
+  if (newTodoText.value !== "") {
     const todo: InsertDto<"todo"> = {
       category: "longterm",
-      name: newSubText.value,
+      name: newTodoText.value,
       user_id: await getUserId(),
-      subtodo_of: parent ? parent : null,
+      subtodo_of: parent,
     };
     const { error } = await supabase.from("todo").insert(todo);
     if (error === null) {
-      newSubText.value = "";
+      newTodoText.value = "";
       await getTodoTemplate();
     }
   } else {
-    newTodoInput.value.focus();
+    textFieldRef.value.focus();
     newSnackbarMessage("Define the name of the todo first!", "error");
   }
 }

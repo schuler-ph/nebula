@@ -92,10 +92,7 @@ import { Row } from "@/types/supabaseHelper";
 import { useDisplay } from "vuetify/lib/framework.mjs";
 const { xs } = useDisplay();
 
-defineProps({
-  category: String,
-  exercises: Array<Row<"exercise">>,
-});
+defineProps<{ category: string; exercises: Array<Row<"exercise">> }>();
 const emit = defineEmits(["openNewDialog", "openEditDialog"]);
 </script>
 

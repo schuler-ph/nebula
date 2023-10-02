@@ -1,9 +1,9 @@
 <template>
   <v-sheet rounded="lg" class="pa-5">
     <v-label>New Todo Name</v-label>
-    <v-text-field v-model="newSubText" variant="solo"></v-text-field>
+    <v-text-field v-model="newTodoText" variant="solo"></v-text-field>
     <v-expansion-panels>
-      <v-expansion-panel v-for="todo in template">
+      <v-expansion-panel v-for="todo in dlTodos">
         <v-expansion-panel-title class="text-h5">
           <div class="d-flex align-center">
             <CustomDialog
@@ -57,11 +57,11 @@
             </div>
           </v-sheet>
           <v-divider class="my-5" :thickness="2"></v-divider>
-          <v-btn @click="addNewTodo(todo.id)"> New Subtodo </v-btn>
+          <v-btn @click="() => addNewTodo(todo.id)"> New Subtodo </v-btn>
         </v-expansion-panel-text>
       </v-expansion-panel>
     </v-expansion-panels>
-    <v-btn @click="addNewTodo()" class="mt-5"> New Todo </v-btn>
+    <v-btn @click="() => addNewTodo(null)" class="mt-5"> New Todo </v-btn>
   </v-sheet>
 </template>
 
@@ -74,41 +74,23 @@ import { capFirst } from "@/helper/stringHelper";
 import CustomDialog from "@/components/generic/CustomDialog.vue";
 import { useDisplay } from "vuetify";
 import { useStorageStore } from "@/store/storageStore";
+import { getDailyTodos } from "@/store/storage/todos";
 const { smAndDown } = useDisplay();
 
-const template = ref<TodoTemplate[]>([]);
-type TodoTemplate = Row<"todo"> & { subtodos?: Row<"todo">[] };
-const newSubText = ref("");
+const dlTodos = ref();
+const newTodoText = ref("");
 
 onMounted(() => {
   alignTodos();
 });
-const { allTodos, initTodos } = useStorageStore();
+const { initTodosSingle } = useStorageStore();
 
 function alignTodos() {
-  let todos: Row<"todo">[];
-  template.value = [];
-
-  const req = allTodos
-    .filter((at) => at.category === "daily")
-    .sort((a, b) => {
-      if (a.order! < b.order!) return 1;
-      else if (a.order! > b.order!) return -1;
-      return 0;
-    });
-
-  todos = req.filter((d) => d.subtodo_of === null);
-  todos.forEach((t) => {
-    const subtodos = req.filter((d) => d.subtodo_of === t.id);
-    template.value.push({
-      ...t,
-      subtodos,
-    });
-  });
+  dlTodos.value = getDailyTodos(false);
 }
 
 async function getTodoTemplate() {
-  await initTodos();
+  await initTodosSingle();
   alignTodos();
 }
 
@@ -116,16 +98,15 @@ function check(e: Event) {
   e.stopPropagation();
 }
 
-async function addNewTodo(parent?: string) {
-  const todo: InsertDto<"todo"> = {
+async function addNewTodo(parent: string | null) {
+  const { error } = await supabase.from("todo").insert({
     category: "daily",
-    name: newSubText.value,
+    name: newTodoText.value,
     user_id: await getUserId(),
-    subtodo_of: parent ? parent : null,
-  };
-  const { error } = await supabase.from("todo").insert(todo);
+    subtodo_of: parent,
+  });
   if (error === null) {
-    newSubText.value = "";
+    newTodoText.value = "";
     await getTodoTemplate();
   }
 }
