@@ -49,7 +49,7 @@ onBeforeMount(async () => {
   top: 6px;
   left: 6px;
   border-radius: 50%;
-  box-shadow: 0 5.6000000000000005px 0 0 #5f2a62;
+  box-shadow: 0 5.6000000000000005px 0 0 #673ab7;
   transform-origin: 94px 96.8px;
 }
 .loadingio-spinner-eclipse-ui0s8haubu {

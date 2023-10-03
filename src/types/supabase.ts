@@ -12,6 +12,7 @@ export interface Database {
       diary: {
         Row: {
           content: string | null
+          contentEnc: string | null
           currentWeight: number | null
           day: string
           id: string
@@ -22,6 +23,7 @@ export interface Database {
         }
         Insert: {
           content?: string | null
+          contentEnc?: string | null
           currentWeight?: number | null
           day: string
           id?: string
@@ -32,6 +34,7 @@ export interface Database {
         }
         Update: {
           content?: string | null
+          contentEnc?: string | null
           currentWeight?: number | null
           day?: string
           id?: string
@@ -225,7 +228,52 @@ export interface Database {
       }
     }
     Views: {
-      [_ in never]: never
+      decrypted_diary: {
+        Row: {
+          content: string | null
+          contentEnc: string | null
+          currentWeight: number | null
+          day: string | null
+          decrypted_contentEnc: string | null
+          id: string | null
+          last_modified: string | null
+          title: string | null
+          todoDailyDone: string[] | null
+          user_id: string | null
+        }
+        Insert: {
+          content?: string | null
+          contentEnc?: string | null
+          currentWeight?: number | null
+          day?: string | null
+          decrypted_contentEnc?: never
+          id?: string | null
+          last_modified?: string | null
+          title?: string | null
+          todoDailyDone?: string[] | null
+          user_id?: string | null
+        }
+        Update: {
+          content?: string | null
+          contentEnc?: string | null
+          currentWeight?: number | null
+          day?: string | null
+          decrypted_contentEnc?: never
+          id?: string | null
+          last_modified?: string | null
+          title?: string | null
+          todoDailyDone?: string[] | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "diary_user_id_fkey"
+            columns: ["user_id"]
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
     }
     Functions: {
       [_ in never]: never
