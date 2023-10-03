@@ -139,7 +139,7 @@ const openEditDialog = () => {
   const todoToEdit = allTodos.find((at) => at.id === editTodoId.value);
   if (todoToEdit) {
     editTodoText.value = todoToEdit.name;
-    editTodoStatus.value = todoToEdit.done;
+    editTodoStatus.value = !todoToEdit.done;
     editTodoTime.value = new Date();
     editTodoDialogOpen.value = true;
   }

@@ -2,22 +2,27 @@
   <v-sheet rounded="lg" class="pa-5">
     <v-label>New Todo Name</v-label>
     <v-text-field v-model="newTodoText" variant="solo"></v-text-field>
+    <div class="d-flex justify-center mb-5">
+      <v-btn @click="() => addNewTodo(null)"> New Todo </v-btn>
+    </div>
     <v-expansion-panels>
       <v-expansion-panel v-for="todo in dlTodos">
         <v-expansion-panel-title class="text-h5">
           <div class="d-flex align-center">
-            <CustomDialog
-              :action="() => disableTodo(todo.id, todo.inactive)"
+            <v-btn
               :color="todo.inactive ? 'secondary' : 'primary'"
-              class="text-h6"
-              :icon="todo.inactive ? 'mdi-delete-restore' : 'mdi-delete'"
+              class="mr-5 text-h6"
+              icon="mdi-pencil"
               size="small"
+              @click="
+                () => {
+                  editTodoId = todo.id;
+                  openEditDialog();
+                }
+              "
+              @click.native="check($event)"
             >
-              <template v-slot:content>
-                Are you sure you want to
-                {{ todo.inactive ? "enable" : "disable" }} this todo?
-              </template>
-            </CustomDialog>
+            </v-btn>
             <div class="mx-5">{{ capFirst(todo.name) }}</div>
             <v-text-field
               class="d-flex"
@@ -40,18 +45,19 @@
             class="my-3 d-flex align-center"
             v-for="sub in todo.subtodos"
           >
-            <CustomDialog
-              :action="() => disableTodo(sub.id, sub.inactive)"
+            <v-btn
               :color="sub.inactive ? 'secondary' : 'primary'"
               :class="smAndDown ? 'mr-2' : 'mx-5'"
-              :icon="sub.inactive ? 'mdi-delete-restore' : 'mdi-delete'"
+              icon="mdi-pencil"
               size="x-small"
+              @click="
+                () => {
+                  editTodoId = sub.id;
+                  openEditDialog();
+                }
+              "
             >
-              <template v-slot:content>
-                Are you sure you want to
-                {{ sub.inactive ? "enable" : "disable" }} this subtodo?
-              </template>
-            </CustomDialog>
+            </v-btn>
             <div>
               {{ capFirst(sub.name) }}
             </div>
@@ -61,8 +67,40 @@
         </v-expansion-panel-text>
       </v-expansion-panel>
     </v-expansion-panels>
-    <v-btn @click="() => addNewTodo(null)" class="mt-5"> New Todo </v-btn>
   </v-sheet>
+
+  <v-dialog v-model="editTodoDialogOpen" width="500">
+    <v-card>
+      <v-card-text>
+        <v-text-field label="Title" v-model="editTodoText"></v-text-field>
+        <v-switch
+          label="Active"
+          color="primary"
+          v-model="editTodoStatus"
+        ></v-switch>
+      </v-card-text>
+      <v-card-actions>
+        <div class="d-flex">
+          <v-btn color="primary" @click="() => submitEditTodo()"
+            >Submit Changes</v-btn
+          >
+          <!-- <CustomDialog
+            :action="() => deleteTodo()"
+            color="red"
+            icon="mdi-delete"
+            size="small"
+          >
+            <template v-slot:content>
+              Are you sure you want to delete this todo?
+            </template>
+          </CustomDialog> -->
+          <v-btn color="secondary" @click="() => (editTodoDialogOpen = false)"
+            >Cancel</v-btn
+          >
+        </div>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
 </template>
 
 <script setup lang="ts">
@@ -79,6 +117,44 @@ const { smAndDown } = useDisplay();
 
 const dlTodos = ref();
 const newTodoText = ref("");
+
+const editTodoDialogOpen = ref(false);
+const editTodoId = ref<string>();
+const editTodoText = ref("");
+const editTodoTime = ref<Date>();
+const editTodoStatus = ref(false);
+
+const openEditDialog = () => {
+  const { allTodos } = useStorageStore();
+  const todoToEdit = allTodos.find((at) => at.id === editTodoId.value);
+  if (todoToEdit) {
+    editTodoText.value = todoToEdit.name;
+    editTodoStatus.value = !todoToEdit.inactive;
+    editTodoTime.value = new Date();
+    editTodoDialogOpen.value = true;
+  }
+};
+
+// const deleteTodo = async () => {
+//   editTodoDialogOpen.value = false;
+//   const { error } = await supabase
+//     .from("todo")
+//     .delete()
+//     .eq("id", editTodoId.value);
+//   await getTodoTemplate();
+// };
+const submitEditTodo = async () => {
+  editTodoDialogOpen.value = false;
+  await supabase
+    .from("todo")
+    .update({
+      name: editTodoText.value,
+      updated_at: editTodoTime.value!.toUTCString(),
+      inactive: !editTodoStatus.value,
+    })
+    .eq("id", editTodoId.value);
+  await getTodoTemplate();
+};
 
 onMounted(() => {
   alignTodos();
