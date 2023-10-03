@@ -11,11 +11,11 @@
 </template>
 
 <script setup lang="ts">
-import { usePlannerStore } from "@/store/plannerStore";
 import { supabase } from "@/lib/supabaseClient";
 import { onMounted, ref } from "vue";
 import { Row } from "@/types/supabaseHelper";
 import { useStorageStore } from "@/store/storageStore";
+import { useTrainingStore } from "@/store/trainingStore";
 
 const splits = ref<Row<"split">[]>();
 const selectedSplit = ref<Row<"split">>();
@@ -26,7 +26,7 @@ onMounted(() => {
   splits.value = allSplits;
 });
 
-const { start_training, end_training } = usePlannerStore();
+const { start_training, end_training } = useTrainingStore();
 
 const itemProps: any = (item: Row<"split">) => {
   return {

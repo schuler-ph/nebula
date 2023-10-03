@@ -18,7 +18,7 @@ import { useStorageStore } from "@/store/storageStore";
 
 const { todoDaily } = useDiaryContent();
 
-onMounted(async () => {
+onMounted(() => {
   const { day } = useRoute().params;
 
   const { allEntrys } = useStorageStore();

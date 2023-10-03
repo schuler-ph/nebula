@@ -86,6 +86,7 @@ onMounted(() => {
 const { initTodosSingle } = useStorageStore();
 
 function alignTodos() {
+  dlTodos.value = [];
   dlTodos.value = getDailyTodos(false);
 }
 

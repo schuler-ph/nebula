@@ -69,11 +69,11 @@ const { smAndDown, xs, md } = useDisplay();
 
 import nebulaLogo from "@/assets/logo.svg";
 import nebulaBg from "@/assets/bg/appBarNebula.jpg";
-import { usePlannerStore } from "@/store/plannerStore";
 import { storeToRefs } from "pinia";
 import TrainingBar from "@/components/menu/TrainingBar.vue";
+import { useTrainingStore } from "@/store/trainingStore";
 
-const { trainingStatus } = storeToRefs(usePlannerStore());
+const { trainingStatus } = storeToRefs(useTrainingStore());
 
 const links = [
   {

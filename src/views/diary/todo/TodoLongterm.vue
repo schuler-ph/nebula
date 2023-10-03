@@ -175,6 +175,7 @@ onMounted(() => {
 const { initTodosSingle } = useStorageStore();
 
 const alignTodos = () => {
+  ltTodos.value = [];
   ltTodos.value = getLongtermTodos();
 };
 

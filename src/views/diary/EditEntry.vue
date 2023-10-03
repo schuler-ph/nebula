@@ -214,21 +214,18 @@ async function submitUpdate() {
       .update(currentEntry())
       .eq("day", day);
 
-    await initDiarySingle();
-
-    setTimeout(() => {
-      if (error === null) {
-        router.push({ name: "Home" });
+    if (error === null) {
+      router.push({ name: "Home" });
+      await initDiarySingle();
+    } else {
+      if (error.code === "23505") {
+        // just as template
+        // newSnackbarMessage("You already created an entry for this day!", "error");
       } else {
-        if (error.code === "23505") {
-          // just as template
-          // newSnackbarMessage("You already created an entry for this day!", "error");
-        } else {
-          console.log("UPDATE ERROR", error);
-          newSnackbarMessage(error.message, "error");
-        }
+        console.log("UPDATE ERROR", error);
+        newSnackbarMessage(error.message, "error");
       }
-    }, 200);
+    }
   } else {
     router.push({ name: "Home" });
   }

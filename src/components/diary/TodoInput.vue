@@ -89,7 +89,7 @@ const { modelValue } = defineProps<{
 }>();
 defineEmits(["update:modelValue"]);
 
-const adt = ref(getDailyTodos());
+const adt = ref(getDailyTodos(true));
 
 function check(e: Event) {
   e.stopPropagation();

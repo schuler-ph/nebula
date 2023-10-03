@@ -39,43 +39,8 @@ export const usePlannerStore = defineStore("planner", {
     totalSubTodos: 0,
     weekdays: [] as Array<Weekday>,
     weekOffset: 0,
-    trainingStatus: false,
-    trainingStarted: undefined as Date | undefined,
-    trainingSplit: "",
-    currentExercise: 0,
-    splitExercises: [] as Row<"exercise">[],
   }),
   actions: {
-    start_training(split: Row<"split">) {
-      if (split) {
-        this.splitExercises = [];
-        this.trainingStarted = new Date();
-        this.trainingSplit = split.name;
-
-        split.exercises.forEach((e) => {
-          const { allExercises } = useStorageStore();
-          this.splitExercises.push(allExercises.find((ae) => ae.id === e)!);
-        });
-
-        this.currentExercise = 0;
-        this.trainingStatus = true;
-      }
-    },
-    end_training() {
-      this.trainingSplit = "";
-      this.splitExercises = [];
-      this.trainingStatus = false;
-    },
-    next_exercise() {
-      if (this.currentExercise + 1 < this.splitExercises.length) {
-        this.currentExercise++;
-      }
-    },
-    prev_exercise() {
-      if (this.currentExercise - 1 >= 0) {
-        this.currentExercise--;
-      }
-    },
     nextWeek() {
       this.weekOffset++;
       this.weekdays.forEach((wd) => {

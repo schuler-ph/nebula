@@ -13,7 +13,6 @@
 </template>
 
 <script setup lang="ts">
-import { usePlannerStore } from "@/store/plannerStore";
 import { onMounted, ref } from "vue";
 import {
   differenceInSeconds,
@@ -21,11 +20,12 @@ import {
   differenceInHours,
 } from "date-fns";
 import { storeToRefs } from "pinia";
+import { useTrainingStore } from "@/store/trainingStore";
 const { trainingSplit, currentExercise, splitExercises } = storeToRefs(
-  usePlannerStore()
+  useTrainingStore()
 );
 
-const { prev_exercise, next_exercise, trainingStarted } = usePlannerStore();
+const { prev_exercise, next_exercise, trainingStarted } = useTrainingStore();
 
 const hrs = ref(0);
 const min = ref(0);
