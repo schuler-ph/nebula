@@ -85,17 +85,3 @@ async function submitLogin() {
   }
 }
 </script>
-
-<style scoped>
-.nebulaTextGradient {
-  background-image: linear-gradient(90deg, #c782f1, #5270dc);
-  background-clip: border-box;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-.nebulaBgGradient {
-  background-image: linear-gradient(90deg, #c782f1, #5270dc);
-  -webkit-text-fill-color: transparent;
-  -webkit-text-fill-color: white;
-}
-</style>

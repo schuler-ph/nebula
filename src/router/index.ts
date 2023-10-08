@@ -66,7 +66,7 @@ const routes = [
   },
   {
     path: "/auth",
-    component: () => import("@/layouts/auth/Default.vue"),
+    component: () => import("@/layouts/v1/Default.vue"),
     children: [
       {
         path: "",
@@ -77,7 +77,7 @@ const routes = [
   },
   {
     path: "/:pathMatch(.*)*",
-    component: () => import("@/layouts/auth/Default.vue"),
+    component: () => import("@/layouts/v1/Default.vue"),
     children: [
       {
         path: "",
