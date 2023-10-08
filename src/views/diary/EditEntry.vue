@@ -110,11 +110,6 @@
         </v-card>
       </v-dialog>
     </v-sheet>
-    <CustomSnackbar
-      v-model="snackbarOpen"
-      :text="snackbarText"
-      :color="snackbarColor"
-    />
   </v-form>
 </template>
 
@@ -122,25 +117,24 @@
 import { ref } from "vue";
 import { InsertDto, UpdateDto } from "@/types/supabaseHelper";
 import { getUserId, supabase } from "@/lib/supabaseClient";
-import CustomSnackbar from "@/components/generic/CustomSnackbar.vue";
 import router from "@/router";
 import { useRoute } from "vue-router";
 import { onMounted } from "vue";
-import { useSnackbar } from "@/hooks/useSnackbar";
 import { useDiaryContent } from "@/hooks/useDiaryContent";
 import TodoCollection from "@/components/diary/TodoCollection.vue";
 import { useDisplay } from "vuetify";
 import { useStorageStore } from "@/store/storageStore";
-const { smAndUp } = useDisplay();
+import { useSnackbarStore } from "@/store/snackbarStore";
 
+const { newSnackbarMessage } = useSnackbarStore();
+const { smAndUp } = useDisplay();
 const { day } = useRoute().params;
 const currentTime = new Date().toUTCString();
 const modifiedTime = ref<Date>();
 
 const { date, title, content, todoDaily, currentWeight, weightSlider } =
   useDiaryContent();
-const { snackbarOpen, snackbarText, snackbarColor, newSnackbarMessage } =
-  useSnackbar();
+
 const cancelDialog = ref(false);
 let oldEntry: UpdateDto<"diary">;
 
@@ -182,6 +176,7 @@ onMounted(async () => {
     const { error } = await supabase.from("diary").insert(entry);
 
     if (error === null) {
+      await initDiarySingle();
       newSnackbarMessage("New entry created!", "info");
     } else {
       newSnackbarMessage(

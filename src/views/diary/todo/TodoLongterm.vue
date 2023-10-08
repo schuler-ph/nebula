@@ -102,11 +102,6 @@
       </v-card>
     </v-dialog>
   </v-sheet>
-  <CustomSnackbar
-    v-model="snackbarOpen"
-    :text="snackbarText"
-    :color="snackbarColor"
-  />
 </template>
 
 <script setup lang="ts">
@@ -116,14 +111,13 @@ import { ref } from "vue";
 import { onMounted } from "vue";
 import { capFirst } from "@/helper/stringHelper";
 import CustomDialog from "@/components/generic/CustomDialog.vue";
-import CustomSnackbar from "@/components/generic/CustomSnackbar.vue";
 import { useDisplay } from "vuetify";
-import { useSnackbar } from "@/hooks/useSnackbar";
 import { useStorageStore } from "@/store/storageStore";
 import { getLongtermTodos } from "@/store/storage/todos";
+import { useSnackbarStore } from "@/store/snackbarStore";
+
 const { smAndDown } = useDisplay();
-const { snackbarOpen, snackbarText, snackbarColor, newSnackbarMessage } =
-  useSnackbar();
+const { newSnackbarMessage } = useSnackbarStore();
 
 const newTodoText = ref("");
 const textFieldRef = ref();

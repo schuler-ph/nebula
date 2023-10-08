@@ -49,19 +49,12 @@
 
     <v-btn @click="() => submitChanges()">Submit</v-btn>
   </v-sheet>
-  <CustomSnackbar
-    v-model="snackbarOpen"
-    :text="snackbarText"
-    :color="snackbarColor"
-  />
 </template>
 
 <script setup lang="ts">
 import { supabase } from "@/lib/supabaseClient";
 import { onMounted, ref } from "vue";
 import { Row } from "@/types/supabaseHelper";
-import { useSnackbar } from "@/hooks/useSnackbar";
-import CustomSnackbar from "@/components/generic/CustomSnackbar.vue";
 import {
   capFirst,
   subCategoryTranslator,
@@ -69,9 +62,9 @@ import {
 } from "@/helper/stringHelper";
 import { useStorageStore } from "@/store/storageStore";
 import { storeToRefs } from "pinia";
+import { useSnackbarStore } from "@/store/snackbarStore";
 
-const { snackbarOpen, snackbarText, snackbarColor, newSnackbarMessage } =
-  useSnackbar();
+const { newSnackbarMessage } = useSnackbarStore();
 const selectedSplit = ref();
 
 const categories = ["Push", "Pull", "Legs", "Core"];

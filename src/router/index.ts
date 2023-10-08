@@ -93,12 +93,17 @@ const router = createRouter({
   routes,
 });
 
-router.beforeEach(async (to, from) => {
-  const { auth_valid } = useAuthStore();
+// router.beforeEach(async (to, from) => {
 
-  if (!auth_valid && to.name !== "Login") {
-    return { name: "Login" };
-  }
+//   if (!auth_valid && to.name !== "Login") {
+//     return { name: "Login" };
+//   }
+// });
+
+router.beforeEach((to, from, next) => {
+  const { auth_valid } = useAuthStore();
+  if (to.name !== "Login" && !auth_valid) next({ name: "Login" });
+  else next();
 });
 
 export default router;

@@ -43,11 +43,6 @@
     </v-card-actions>
   </v-card>
   <v-card v-else title="Loading..."> </v-card>
-  <CustomSnackbar
-    v-model="snackbarOpen"
-    :text="snackbarText"
-    :color="snackbarColor"
-  />
 </template>
 
 <script setup lang="ts">
@@ -56,10 +51,9 @@ import { storeToRefs } from "pinia";
 import { useAuthStore } from "@/store/authStore";
 import useAuth from "@/hooks/useAuth";
 import nebulaLogo from "@/assets/logo.svg";
-import CustomSnackbar from "@/components/generic/CustomSnackbar.vue";
-import { useSnackbar } from "@/hooks/useSnackbar";
-const { snackbarOpen, snackbarText, snackbarColor, newSnackbarMessage } =
-  useSnackbar();
+import { useSnackbarStore } from "@/store/snackbarStore";
+
+const { newSnackbarMessage } = useSnackbarStore();
 
 const valid = ref(false);
 const email = ref("");
