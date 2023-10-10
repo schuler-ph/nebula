@@ -7,14 +7,14 @@
   >
     <v-img :src="nebulaLogo" height="100"></v-img>
     <span class="text-h5 mb-10 mt-3"
-      >Login to the
-      <span class="font-weight-black nebulaTextGradient">Nebula</span></span
+      >Login to the <my-beautiful-text>Nebula</my-beautiful-text></span
     >
     <v-form v-model="valid" class="w-100">
       <v-text-field
         v-model="email"
         :rules="emailRules"
         label="Email"
+        type="email"
         prepend-inner-icon="mdi-email"
         required
         color="primary"
@@ -33,12 +33,8 @@
     </v-form>
 
     <v-card-actions>
-      <v-btn
-        elevation="10"
-        class="text-h6 font-weight-bold nebulaBgGradient px-5 d-flex"
-        @click="submitLogin"
-        prepend-icon="mdi-login"
-        >Login</v-btn
+      <my-beautiful-btn :action="submitLogin" prepend-icon="mdi-login"
+        >Login</my-beautiful-btn
       >
     </v-card-actions>
   </v-card>
@@ -52,6 +48,8 @@ import { useAuthStore } from "@/store/authStore";
 import useAuth from "@/hooks/useAuth";
 import nebulaLogo from "@/assets/logo.svg";
 import { useSnackbarStore } from "@/store/snackbarStore";
+import MyBeautifulText from "@/components/generic/MyBeautifulText.vue";
+import MyBeautifulBtn from "@/components/generic/MyBeautifulBtn.vue";
 
 const { newSnackbarMessage } = useSnackbarStore();
 

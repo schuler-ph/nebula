@@ -16,5 +16,3 @@
 <script setup lang="ts">
 import nebulaBg from "@/assets/bg/appBarNebula.jpg";
 </script>
-
-<style src="../../plugins/styles.css"></style>

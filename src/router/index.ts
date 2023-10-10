@@ -1,80 +1,12 @@
 // Composables
 import { createRouter, createWebHashHistory } from "vue-router";
 import { useAuthStore } from "@/store/authStore";
+import { mainRoutes } from "./mainRoutes";
+import { authRoutes } from "./authRoutes";
 
 const routes = [
-  {
-    path: "/",
-    component: () => import("@/layouts/default/Default.vue"),
-    children: [
-      {
-        path: "",
-        name: "Home",
-        component: () => import("@/views/training/Plan.vue"),
-      },
-      {
-        path: "allEntries",
-        name: "AllEntries",
-        component: () => import("@/views/AllEntries.vue"),
-      },
-      {
-        path: "edit/:day",
-        name: "EditEntry",
-        component: () => import("@/views/diary/EditEntry.vue"),
-      },
-      {
-        path: "weekclosure",
-        name: "WeekClosure",
-        component: () => import("@/views/diary/WeekClosure.vue"),
-      },
-      {
-        path: "training/split",
-        name: "Split",
-        component: () => import("@/views/training/Split.vue"),
-      },
-      {
-        path: "training/exercises",
-        name: "Exercises",
-        component: () => import("@/views/training/Exercises.vue"),
-      },
-      {
-        path: "training",
-        name: "Training",
-        component: () => import("@/views/training/Training.vue"),
-      },
-      {
-        path: "todo/daily",
-        name: "TodoDaily",
-        component: () => import("@/views/diary/todo/TodoDaily.vue"),
-      },
-      {
-        path: "todo/longterm",
-        name: "TodoLongterm",
-        component: () => import("@/views/diary/todo/TodoLongterm.vue"),
-      },
-      {
-        path: "about",
-        name: "About",
-        component: () => import("@/views/About.vue"),
-      },
-      {
-        path: "history",
-        name: "History",
-        component: () => import("@/views/history/WeightHistory.vue"),
-      },
-    ],
-  },
-  {
-    path: "/auth",
-    component: () => import("@/layouts/v1/Default.vue"),
-    children: [
-      {
-        path: "",
-        name: "Login",
-        component: () => import("@/views/auth/Login.vue"),
-      },
-    ],
-  },
+  ...mainRoutes,
+  ...authRoutes,
   {
     path: "/:pathMatch(.*)*",
     component: () => import("@/layouts/v1/Default.vue"),
@@ -93,17 +25,12 @@ const router = createRouter({
   routes,
 });
 
-// router.beforeEach(async (to, from) => {
-
-//   if (!auth_valid && to.name !== "Login") {
-//     return { name: "Login" };
-//   }
-// });
-
-router.beforeEach((to, from, next) => {
+router.beforeEach((to, from) => {
   const { auth_valid } = useAuthStore();
-  if (to.name !== "Login" && !auth_valid) next({ name: "Login" });
-  else next();
+  // if (to.name !== "Login" && !auth_valid) next({ name: "Login" });
+  // else next();
+  console.log(to);
+  console.log(from);
 });
 
 export default router;
