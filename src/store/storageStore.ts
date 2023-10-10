@@ -9,7 +9,6 @@ export const useStorageStore = defineStore("storage", {
     allSplits: [] as Row<"split">[],
     allEntrys: [] as Row<"diary">[],
     allTodos: [] as Row<"todo">[],
-    initWeekdays: null as any,
   }),
   actions: {
     async initEx() {

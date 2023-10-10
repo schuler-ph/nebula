@@ -115,12 +115,22 @@ const linksTodo = [
   {
     title: "Todo Daily",
     to: "/todo/daily",
-    icon: "mdi-clipboard-check",
+    icon: "mdi-cake",
   },
   {
     title: "Todo Longterm",
-    to: "/todo/longterm",
-    icon: "mdi-clipboard-text-clock",
+    to: "/todoLt/longterm",
+    icon: "mdi-flag-checkered",
+  },
+  {
+    title: "Todo Uni",
+    to: "/todoLt/uni",
+    icon: "mdi-school",
+  },
+  {
+    title: "Todo Nebula",
+    to: "/todoLt/nebula",
+    icon: "mdi-notebook",
   },
 ];
 

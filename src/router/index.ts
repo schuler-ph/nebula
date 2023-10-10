@@ -48,9 +48,12 @@ const routes = [
         component: () => import("@/views/diary/todo/TodoDaily.vue"),
       },
       {
-        path: "todo/longterm",
+        path: "todoLt/:category",
         name: "TodoLongterm",
         component: () => import("@/views/diary/todo/TodoLongterm.vue"),
+        props: (route: any) => ({
+          category: route.params.category,
+        }),
       },
       {
         path: "about",

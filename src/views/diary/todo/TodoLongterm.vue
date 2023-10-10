@@ -6,10 +6,24 @@
       variant="solo"
       ref="textFieldRef"
     ></v-text-field>
-    <div class="d-flex justify-center">
-      <v-btn @click="() => addNewTodo(null)" class="mb-3"> New Todo </v-btn>
+    <div class="d-flex align-center mb-3">
+      <div></div>
+      <v-spacer />
+      <v-btn @click="() => addNewTodo(null)"> New Todo </v-btn>
+      <v-spacer />
+      <v-btn
+        variant="tonal"
+        @click="
+          () => {
+            showLtDoneTodos = !showLtDoneTodos;
+            alignTodos(props.category);
+          }
+        "
+      >
+        {{ showLtDoneTodos ? "Hide" : "Show" }} done todos
+      </v-btn>
     </div>
-    <v-expansion-panels>
+    <v-expansion-panels v-if="ltTodos && ltTodos.length > 0">
       <v-expansion-panel v-for="todo in ltTodos">
         <v-expansion-panel-title class="text-h5">
           <v-btn
@@ -50,17 +64,6 @@
               "
             >
             </v-btn>
-            <!-- <CustomDialog
-              :action="() => todoToggleDone(sub.id, sub.done)"
-              :color="sub.done ? 'secondary' : 'primary'"
-              :class="smAndDown ? 'mr-2' : 'mx-5'"
-              icon="mdi-pencil"
-              size="x-small"
-            >
-              <template v-slot:content>
-                Are you sure you want to toggle the status of this subtodo?
-              </template>
-            </CustomDialog> -->
             <div>
               {{ capFirst(sub.name) }}
             </div>
@@ -69,12 +72,16 @@
       </v-expansion-panel>
     </v-expansion-panels>
 
+    <div v-else class="d-flex justify-center">
+      <div>No todos yet...</div>
+    </div>
+
     <v-dialog v-model="editTodoDialogOpen" width="500">
       <v-card>
         <v-card-text>
           <v-text-field label="Title" v-model="editTodoText"></v-text-field>
           <v-switch
-            label="Active"
+            label="Done"
             color="primary"
             v-model="editTodoStatus"
           ></v-switch>
@@ -115,6 +122,10 @@ import { useDisplay } from "vuetify";
 import { useStorageStore } from "@/store/storageStore";
 import { getLongtermTodos } from "@/store/storage/todos";
 import { useSnackbarStore } from "@/store/snackbarStore";
+import { onBeforeRouteLeave, useRoute } from "vue-router";
+import { watch } from "vue";
+import { useSettingsStore } from "@/store/settingsStore";
+import { storeToRefs } from "pinia";
 
 const { smAndDown } = useDisplay();
 const { newSnackbarMessage } = useSnackbarStore();
@@ -133,7 +144,7 @@ const openEditDialog = () => {
   const todoToEdit = allTodos.find((at) => at.id === editTodoId.value);
   if (todoToEdit) {
     editTodoText.value = todoToEdit.name;
-    editTodoStatus.value = !todoToEdit.done;
+    editTodoStatus.value = todoToEdit.done;
     editTodoTime.value = new Date();
     editTodoDialogOpen.value = true;
   }
@@ -154,34 +165,43 @@ const submitEditTodo = async () => {
     .update({
       name: editTodoText.value,
       updated_at: editTodoTime.value!.toUTCString(),
-      done: !editTodoStatus.value,
+      done: editTodoStatus.value,
     })
     .eq("id", editTodoId.value);
   await getTodoTemplate();
 };
 
 const ltTodos = ref();
+const props = defineProps(["category"]);
+const { showLtDoneTodos } = storeToRefs(useSettingsStore());
 
 onMounted(() => {
-  alignTodos();
+  alignTodos(props.category);
 });
+
+watch(
+  () => props.category,
+  (newCat) => {
+    alignTodos(newCat);
+  }
+);
 
 const { initTodosSingle } = useStorageStore();
 
-const alignTodos = () => {
+const alignTodos = (cat: string) => {
   ltTodos.value = [];
-  ltTodos.value = getLongtermTodos();
+  ltTodos.value = getLongtermTodos(cat, showLtDoneTodos.value);
 };
 
 async function getTodoTemplate() {
   await initTodosSingle();
-  alignTodos();
+  alignTodos(props.category);
 }
 
 async function addNewTodo(parent: string | null) {
   if (newTodoText.value !== "") {
     const todo: InsertDto<"todo"> = {
-      category: "longterm",
+      category: props.category,
       name: newTodoText.value,
       user_id: await getUserId(),
       subtodo_of: parent,

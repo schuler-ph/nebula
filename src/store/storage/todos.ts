@@ -34,18 +34,26 @@ export const getDailyTodos = (onlyActiveOnes: boolean) => {
   return activeDailyTodos;
 };
 
-export const getLongtermTodos = () => {
+export const getLongtermTodos = (
+  category: string,
+  showLtDoneTodos: boolean
+) => {
   let longtermTodos: TodoTemplate[] = [];
 
   const { allTodos } = useStorageStore();
-  const req = allTodos
-    .filter((at) => at.category === "longterm")
+
+  let req = allTodos
+    .filter((at) => at.category === category)
     .sort((a, b) => {
       if (a.updated_at < b.updated_at) return 1;
       else if (a.updated_at > b.updated_at) return -1;
       return 0;
     });
   // latest updated_at is on top
+
+  if (!showLtDoneTodos) {
+    req = req.filter((r) => r.done !== true);
+  }
 
   let mainTodos: Row<"todo">[];
   mainTodos = req.filter((d) => d.subtodo_of === null);
