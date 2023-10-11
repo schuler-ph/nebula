@@ -12,7 +12,6 @@ export interface Database {
       diary: {
         Row: {
           content: string | null
-          contentEnc: string | null
           currentWeight: number | null
           day: string
           id: string
@@ -23,7 +22,6 @@ export interface Database {
         }
         Insert: {
           content?: string | null
-          contentEnc?: string | null
           currentWeight?: number | null
           day: string
           id?: string
@@ -34,7 +32,6 @@ export interface Database {
         }
         Update: {
           content?: string | null
-          contentEnc?: string | null
           currentWeight?: number | null
           day?: string
           id?: string
@@ -146,6 +143,7 @@ export interface Database {
           last_modified: string
           name: string
           user_id: string
+          weekdaySelection: number[]
         }
         Insert: {
           categories?: string[]
@@ -155,6 +153,7 @@ export interface Database {
           last_modified?: string
           name?: string
           user_id: string
+          weekdaySelection?: number[]
         }
         Update: {
           categories?: string[]
@@ -164,6 +163,7 @@ export interface Database {
           last_modified?: string
           name?: string
           user_id?: string
+          weekdaySelection?: number[]
         }
         Relationships: [
           {
@@ -228,52 +228,7 @@ export interface Database {
       }
     }
     Views: {
-      decrypted_diary: {
-        Row: {
-          content: string | null
-          contentEnc: string | null
-          currentWeight: number | null
-          day: string | null
-          decrypted_contentEnc: string | null
-          id: string | null
-          last_modified: string | null
-          title: string | null
-          todoDailyDone: string[] | null
-          user_id: string | null
-        }
-        Insert: {
-          content?: string | null
-          contentEnc?: string | null
-          currentWeight?: number | null
-          day?: string | null
-          decrypted_contentEnc?: never
-          id?: string | null
-          last_modified?: string | null
-          title?: string | null
-          todoDailyDone?: string[] | null
-          user_id?: string | null
-        }
-        Update: {
-          content?: string | null
-          contentEnc?: string | null
-          currentWeight?: number | null
-          day?: string | null
-          decrypted_contentEnc?: never
-          id?: string | null
-          last_modified?: string | null
-          title?: string | null
-          todoDailyDone?: string[] | null
-          user_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "diary_user_id_fkey"
-            columns: ["user_id"]
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          }
-        ]
-      }
+      [_ in never]: never
     }
     Functions: {
       [_ in never]: never

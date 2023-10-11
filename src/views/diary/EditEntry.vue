@@ -75,15 +75,21 @@
       </v-card>
     </v-sheet>
 
-    <v-sheet class="d-flex justify-center py-5" rounded="lg">
+    <v-sheet
+      class="d-flex justify-center py-5"
+      rounded="lg"
+      :class="trainingStatus ? '' : 'py-5'"
+    >
       <v-btn
         @click="cancelUpdate"
         prepend-icon="mdi-chevron-left"
-        class="fixed cancelButton"
+        class="cancelButton"
+        :class="trainingStatus ? 'fixedButTrainingbar' : 'fixed'"
         >Cancel</v-btn
       >
       <v-btn
-        class="fixed submitButton"
+        class="submitButton"
+        :class="trainingStatus ? 'fixedButTrainingbar' : 'fixed'"
         @click="submitUpdate"
         append-icon="mdi-send"
         >Submit</v-btn
@@ -125,7 +131,10 @@ import TodoCollection from "@/components/diary/TodoCollection.vue";
 import { useDisplay } from "vuetify";
 import { useStorageStore } from "@/store/storageStore";
 import { useSnackbarStore } from "@/store/snackbarStore";
+import { useTrainingStore } from "@/store/trainingStore";
+import { storeToRefs } from "pinia";
 
+const { trainingStatus } = storeToRefs(useTrainingStore());
 const { newSnackbarMessage } = useSnackbarStore();
 const { smAndUp } = useDisplay();
 const { day } = useRoute().params;
@@ -253,6 +262,11 @@ function centerSlider(a: string) {
 .fixed {
   position: fixed;
   bottom: 1.5rem;
+  z-index: 50;
+}
+.fixedButTrainingbar {
+  position: fixed;
+  bottom: 6.5rem;
   z-index: 50;
 }
 .submitButton {

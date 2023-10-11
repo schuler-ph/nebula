@@ -90,9 +90,9 @@ const links = [
 ];
 const linksTraining = [
   {
-    title: "Plan",
+    title: "Week overview",
     to: "/",
-    icon: "mdi-rhombus-split-outline",
+    icon: "mdi-view-day",
   },
   {
     title: "Split",
