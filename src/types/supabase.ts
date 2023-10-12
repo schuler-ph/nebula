@@ -54,9 +54,9 @@ export interface Database {
           category: string
           created_at: string
           id: string
-          isSkill: boolean
           name: string
           subCategory: string | null
+          subSkillCategory: string | null
           updated_at: string
           user_id: string
         }
@@ -64,9 +64,9 @@ export interface Database {
           category?: string
           created_at?: string
           id?: string
-          isSkill?: boolean
           name: string
           subCategory?: string | null
+          subSkillCategory?: string | null
           updated_at?: string
           user_id: string
         }
@@ -74,9 +74,9 @@ export interface Database {
           category?: string
           created_at?: string
           id?: string
-          isSkill?: boolean
           name?: string
           subCategory?: string | null
+          subSkillCategory?: string | null
           updated_at?: string
           user_id?: string
         }

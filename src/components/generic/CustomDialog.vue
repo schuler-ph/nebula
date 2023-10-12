@@ -26,10 +26,9 @@
         <slot name="content"></slot>
       </v-card-text>
       <v-card-actions>
-        <v-sheet class="d-flex">
-          <v-btn variant="tonal" color="red" @click="doit">Confirm</v-btn>
-          <v-btn variant="tonal" @click="dialogOpen = false">Cancel</v-btn>
-        </v-sheet>
+        <v-btn variant="tonal" color="red" @click="doit">Confirm</v-btn>
+        <v-spacer />
+        <v-btn variant="tonal" @click="dialogOpen = false">Cancel</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>

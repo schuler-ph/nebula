@@ -1,5 +1,15 @@
 <template>
   <v-sheet rounded="lg" class="pa-3">
+    <div class="d-flex mb-3 justify-center">
+      <v-btn @click="() => openDialog('')">Add new Split</v-btn>
+      <v-btn
+        @click="() => openDialog(allSplits.find(as => as.id === selectedSplit)!.name)"
+        v-if="selectedSplit"
+        class="ml-3"
+        >Edit split</v-btn
+      >
+    </div>
+
     <v-select
       label="Split name"
       v-model="selectedSplit"
@@ -59,23 +69,96 @@
 
     <v-btn @click="() => submitChanges()">Submit</v-btn>
   </v-sheet>
+  <v-dialog v-model="tempDialogOpen" width="600">
+    <v-card>
+      <v-card-title>{{ selectedSplit ? "Edit" : "Add" }} split</v-card-title>
+      <v-card-text>
+        <v-text-field label="Name of split" v-model="tempSplitName" />
+      </v-card-text>
+      <v-card-actions>
+        <v-btn v-if="selectedSplit" @click="() => submitEdit()">Submit</v-btn>
+        <v-btn v-else @click="() => submitAdd()">Submit</v-btn>
+        <v-spacer />
+        <CustomDialog
+          :action="deleteSplit"
+          color="red"
+          text="Delete"
+          variant="tonal"
+          v-if="selectedSplit"
+          ><template v-slot:content>
+            Are you sure you want to delete this split?
+          </template></CustomDialog
+        >
+        <v-spacer v-if="selectedSplit" />
+        <v-btn @click="() => closeDialog()">Cancel</v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
 </template>
 
 <script setup lang="ts">
-import { supabase } from "@/lib/supabaseClient";
-import { onMounted, ref } from "vue";
+import { getUserId, supabase } from "@/lib/supabaseClient";
+import { ref } from "vue";
 import { Row } from "@/types/supabaseHelper";
-import {
-  capFirst,
-  subCategoryTranslator,
-  skillTranslator,
-} from "@/helper/stringHelper";
+import { exerciseSDforSplit } from "@/helper/stringHelper";
 import { useStorageStore } from "@/store/storageStore";
 import { storeToRefs } from "pinia";
 import { useSnackbarStore } from "@/store/snackbarStore";
+import CustomDialog from "@/components/generic/CustomDialog.vue";
 
 const { newSnackbarMessage } = useSnackbarStore();
 const selectedSplit = ref();
+
+const tempDialogOpen = ref(false);
+const tempSplitName = ref("");
+
+const openDialog = (name: string) => {
+  tempSplitName.value = name;
+  tempDialogOpen.value = true;
+};
+
+const closeDialog = () => {
+  tempSplitName.value = "";
+  tempDialogOpen.value = false;
+};
+
+const submitAdd = async () => {
+  if (tempSplitName.value !== "") {
+    const { error } = await supabase.from("split").insert({
+      exercises: [],
+      user_id: await getUserId(),
+      name: tempSplitName.value,
+    });
+
+    if (error === null) {
+      closeDialog();
+      await initSplitsSingle();
+    } else {
+      newSnackbarMessage("Couldn't add new split", "error");
+    }
+  }
+};
+
+const submitEdit = async () => {
+  if (tempSplitName.value !== "") {
+    const { error } = await supabase
+      .from("split")
+      .update({
+        name: tempSplitName.value,
+      })
+      .eq(
+        "id",
+        allSplits.value.find((as) => as.id === selectedSplit.value)!.id
+      );
+
+    if (error === null) {
+      closeDialog();
+      await initSplitsSingle();
+    } else {
+      newSnackbarMessage("Couldn't edit split", "error");
+    }
+  }
+};
 
 const weekDaysTemplate = [
   { id: 1, name: "Monday" },
@@ -106,11 +189,7 @@ const getExercisesBySelCat = () => {
 };
 
 const itemProps: any = (item: Row<"exercise">) => {
-  const subtitle =
-    subCategoryTranslator(item.subCategory) +
-    item.category +
-    " " +
-    skillTranslator(item.isSkill);
+  const subtitle = exerciseSDforSplit(item);
 
   return {
     title: item.name,
@@ -132,6 +211,18 @@ const submitChanges = async () => {
   } else {
     await initSplitsSingle();
   }
+};
+
+const deleteSplit = async () => {
+  const { error } = await supabase
+    .from("split")
+    .delete()
+    .eq("id", allSplits.value.find((as) => as.id === selectedSplit.value)!.id);
+  if (error !== null) {
+    console.log(error);
+  }
+  closeDialog();
+  await initSplitsSingle();
 };
 
 const recoverSplitData = (mv: string) => {

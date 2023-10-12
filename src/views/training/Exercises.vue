@@ -1,13 +1,46 @@
 <template>
   <v-sheet rounded="lg" class="pa-3">
-    <div class="d-flex justify-center mb-3">
-      <v-btn @click="() => (tempDialogOpen = true)">Add new Exercise</v-btn>
+    <div class="d-flex mb-3 align-center flex-column">
+      <div class="mb-3 d-flex align-center">
+        <v-btn
+          :disabled="selCat === 0"
+          icon="mdi-chevron-left"
+          size="x-small"
+          @click="
+            () => {
+              if (selCat > 0) selCat--;
+            }
+          "
+        ></v-btn>
+        <v-btn variant="tonal" class="mx-3">{{
+          categories[selCat].name
+        }}</v-btn>
+        <v-btn
+          :disabled="selCat === categories.length - 1"
+          icon="mdi-chevron-right"
+          size="x-small"
+          @click="
+            () => {
+              if (selCat < categories.length) selCat++;
+            }
+          "
+        ></v-btn>
+      </div>
+      <v-btn
+        @click="
+          () => {
+            openDialog(categories[selCat].name, null);
+          }
+        "
+        >Add new {{ xs ? "" : categories[selCat].name }} Exercise</v-btn
+      >
     </div>
     <ExercisesCategoryOverview
-      v-for="cat in categories"
-      :category="cat.name"
-      :exercises="cat.exercises.value"
-      @open-new-dialog="(category, isSkill) => openDialog(category, isSkill)"
+      :category="categories[selCat].name"
+      :exercises="categories[selCat].exercises.value"
+      @open-new-dialog="
+        (category, subSkillCategory) => openDialog(category, subSkillCategory)
+      "
       @open-edit-dialog="(exercise) => openEditDialog(exercise)"
     />
   </v-sheet>
@@ -43,11 +76,13 @@
             v-model="tempCategory"
             :items="categories.map((cat) => cat.name)"
           />
-          <v-switch
-            class="d-flex justify-center align-center"
-            :label="tempIsSkill ? 'Skill' : 'Basic'"
-            color="primary"
-            v-model="tempIsSkill"
+          <v-select
+            label="Sub-Skill Category"
+            v-model="tempSubSkillCategory"
+            :items="subSkillCategories"
+            item-title="name"
+            item-value="val"
+            hide-details
           />
         </div>
       </v-card-text>
@@ -84,14 +119,17 @@ import CustomDialog from "@/components/generic/CustomDialog.vue";
 import { useDisplay } from "vuetify/lib/framework.mjs";
 import { capFirst } from "@/helper/stringHelper";
 import { useStorageStore } from "@/store/storageStore";
-const { xs } = useDisplay();
 
+const { xs } = useDisplay();
 const { allExercises, initExSingle } = useStorageStore();
 
 const exercisesPush = ref<Row<"exercise">[]>([]);
 const exercisesPull = ref<Row<"exercise">[]>([]);
 const exercisesLegs = ref<Row<"exercise">[]>([]);
 const exercisesCore = ref<Row<"exercise">[]>([]);
+const stretchingEx = ref<Row<"exercise">[]>([]);
+
+const selCat = ref(0);
 
 onMounted(() => {
   assignExercises();
@@ -107,13 +145,14 @@ const assignExercises = () => {
   exercisesPull.value = allExercises.filter((d) => d.category === "Pull");
   exercisesLegs.value = allExercises.filter((d) => d.category === "Legs");
   exercisesCore.value = allExercises.filter((d) => d.category === "Core");
+  stretchingEx.value = allExercises.filter((d) => d.category === "Stretch");
 };
 
 const tempDialogOpen = ref(false);
 const tempText = ref("");
-const tempIsSkill = ref(false);
 const tempCategory = ref<string | undefined>();
 const tempSubCategory = ref<string | null>(null);
+const tempSubSkillCategory = ref<string | null>(null);
 const tempId = ref();
 
 const categories = [
@@ -129,14 +168,21 @@ const subCategories = [
   { name: "N/A", val: null },
 ];
 
+const subSkillCategories = [
+  { name: "Hold", val: "H" },
+  { name: "Transition", val: "T" },
+  { name: "Reps", val: "R" },
+  { name: "Basic", val: null },
+];
+
 const submitNewExercise = async () => {
   if (tempText.value !== "" && tempCategory.value !== undefined) {
     const { error } = await supabase.from("exercise").insert({
       name: capFirst(tempText.value),
       user_id: await getUserId(),
-      isSkill: tempIsSkill.value,
       category: tempCategory.value,
       subCategory: tempSubCategory.value,
+      subSkillCategory: tempSubSkillCategory.value,
     });
 
     if (error !== null) {
@@ -156,9 +202,9 @@ const submitEditedExercise = async () => {
       .update({
         name: capFirst(tempText.value),
         user_id: await getUserId(),
-        isSkill: tempIsSkill.value,
         category: tempCategory.value,
         subCategory: tempSubCategory.value,
+        subSkillCategory: tempSubSkillCategory.value,
         updated_at,
       })
       .eq("id", tempId.value);
@@ -176,23 +222,23 @@ const cancelDialog = () => {
   tempDialogOpen.value = false;
   tempId.value = undefined;
   tempCategory.value = undefined;
-  tempIsSkill.value = false;
   tempSubCategory.value = null;
+  tempSubSkillCategory.value = null;
   tempText.value = "";
 };
 
-const openDialog = (category: string, isSkill: boolean) => {
+const openDialog = (category: string, subSkillCategory: string | null) => {
   tempId.value = undefined;
   tempCategory.value = category;
-  tempIsSkill.value = isSkill;
+  tempSubSkillCategory.value = subSkillCategory;
   tempDialogOpen.value = true;
 };
 
 const openEditDialog = (exercise: Row<"exercise">) => {
   tempText.value = exercise.name;
   tempCategory.value = exercise.category;
-  tempIsSkill.value = exercise.isSkill;
   tempSubCategory.value = exercise.subCategory;
+  tempSubSkillCategory.value = exercise.subSkillCategory;
   tempId.value = exercise.id;
   tempDialogOpen.value = true;
 };

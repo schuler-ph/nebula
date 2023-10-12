@@ -16,7 +16,7 @@ export const useStorageStore = defineStore("storage", {
         .from("exercise")
         .select()
         .order("category")
-        .order("isSkill", { ascending: false })
+        .order("subSkillCategory")
         .order("subCategory")
         .order("name");
       if (error === null && data.length !== 0) {
