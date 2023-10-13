@@ -30,12 +30,15 @@
               ></v-checkbox-btn>
             </div>
             <span class="text-h5 font-weight-regular">
-              {{ capFirst(todo.name) }} ({{
-                modelValue?.filter((i1) =>
-                  todo.subtodos?.some((i2) => i2.id === i1)
-                ).length
-              }}
-              / {{ todo.subtodos?.length }})
+              {{ capFirst(todo.name) }}
+              <nobr
+                >({{
+                  modelValue?.filter((i1) =>
+                    todo.subtodos?.some((i2) => i2.id === i1)
+                  ).length
+                }}
+                / {{ todo.subtodos?.length }})</nobr
+              >
             </span>
           </v-sheet>
         </v-expansion-panel-title>
