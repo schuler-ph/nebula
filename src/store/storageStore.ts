@@ -7,7 +7,7 @@ export const useStorageStore = defineStore("storage", {
     loadingData: true,
     allExercises: [] as Row<"exercise">[],
     allSplits: [] as Row<"split">[],
-    allEntrys: [] as Row<"diary">[],
+    allEntries: [] as Row<"diary">[],
     allTodos: [] as Row<"todo">[],
   }),
   actions: {
@@ -48,7 +48,7 @@ export const useStorageStore = defineStore("storage", {
         .select()
         .order("day", { ascending: false });
       if (error === null && data.length !== 0) {
-        this.allEntrys = data;
+        this.allEntries = data;
       }
     },
     async initDiarySingle() {

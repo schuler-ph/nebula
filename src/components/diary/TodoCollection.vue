@@ -21,7 +21,7 @@ const { todoDaily } = useDiaryContent();
 onMounted(() => {
   const { day } = useRoute().params;
 
-  const { allEntrys } = useStorageStore();
+  const { allEntries: allEntrys } = useStorageStore();
   const todoDailyDone = allEntrys.find((e) => e.day === day)?.todoDailyDone;
 
   todoDaily.value = todoDailyDone!;

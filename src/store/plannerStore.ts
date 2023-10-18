@@ -32,6 +32,7 @@ export interface Weekday {
   instance?: Row<"diary">;
   contentLength: number;
   doneSubTodos: number;
+  linkedTodos: string[];
 }
 
 export const usePlannerStore = defineStore("planner", {
@@ -64,8 +65,8 @@ export const usePlannerStore = defineStore("planner", {
       this.initiateWeekdays();
     },
     create_weekday(index: number, name: string, color: string, date: Date) {
-      const { allEntrys } = useStorageStore();
-      const wdEntry = allEntrys.find((ae) => ae.day === dateToIsoString(date));
+      const { allEntries, allTodos } = useStorageStore();
+      const wdEntry = allEntries.find((ae) => ae.day === dateToIsoString(date));
 
       const wdTemp: Weekday = {
         index: index,
@@ -74,6 +75,7 @@ export const usePlannerStore = defineStore("planner", {
         date: date,
         contentLength: 0,
         doneSubTodos: 0,
+        linkedTodos: [],
       };
 
       if (wdEntry && wdEntry.content) {
@@ -93,6 +95,12 @@ export const usePlannerStore = defineStore("planner", {
         wdTemp.contentLength = 0;
         wdTemp.instance = undefined;
       }
+
+      allTodos.forEach((at) => {
+        if (at.linked_date?.split(" ")[0] === dateToIsoString(date) && !at.done)
+          wdTemp.linkedTodos.push(at.id);
+      });
+
       return wdTemp;
     },
     initiateWeekdays() {

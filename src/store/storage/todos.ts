@@ -1,7 +1,7 @@
 import { Row } from "@/types/supabaseHelper";
 import { useStorageStore } from "../storageStore";
 
-type TodoTemplate = Row<"todo"> & { subtodos?: Row<"todo">[] };
+export type TodoTemplate = Row<"todo"> & { subtodos?: Row<"todo">[] };
 
 export const getDailyTodos = (onlyActiveOnes: boolean) => {
   let activeDailyTodos: TodoTemplate[] = [];
@@ -47,6 +47,11 @@ export const getLongtermTodos = (
     .sort((a, b) => {
       if (a.updated_at < b.updated_at) return 1;
       else if (a.updated_at > b.updated_at) return -1;
+      return 0;
+    })
+    .sort((a, b) => {
+      if (a.linked_date! < b.linked_date!) return -1;
+      if (a.linked_date! > b.linked_date!) return 1;
       return 0;
     });
   // latest updated_at is on top

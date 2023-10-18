@@ -181,6 +181,7 @@ export interface Database {
           done: boolean
           id: string
           inactive: boolean
+          linked_date: string | null
           name: string
           order: number | null
           subtodo_of: string | null
@@ -193,6 +194,7 @@ export interface Database {
           done?: boolean
           id?: string
           inactive?: boolean
+          linked_date?: string | null
           name: string
           order?: number | null
           subtodo_of?: string | null
@@ -205,6 +207,7 @@ export interface Database {
           done?: boolean
           id?: string
           inactive?: boolean
+          linked_date?: string | null
           name?: string
           order?: number | null
           subtodo_of?: string | null

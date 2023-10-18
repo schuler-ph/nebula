@@ -1,6 +1,6 @@
 {
   "name": "nebula",
-  "version": "0.4.9",
+  "version": "0.4.10",
   "scripts": {
     "dev": "vite",
     "types": "npx supabase gen types typescript --project-id \"nsysvbhfzbomwglmhzus\" --schema public > src/types/supabase.ts",
@@ -10,6 +10,7 @@
   "dependencies": {
     "@mdi/font": "7.0.96",
     "@supabase/supabase-js": "^2.26.0",
+    "@vuepic/vue-datepicker": "^7.2.0",
     "date-fns": "^2.30.0",
     "pinia": "^2.0.23",
     "pinia-plugin-persistedstate": "^3.2.0",

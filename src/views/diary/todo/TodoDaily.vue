@@ -80,11 +80,11 @@
         ></v-switch>
       </v-card-text>
       <v-card-actions>
-        <div class="d-flex">
-          <v-btn color="primary" @click="() => submitEditTodo()"
-            >Submit Changes</v-btn
-          >
-          <!-- <CustomDialog
+        <v-btn color="primary" @click="() => submitEditTodo()"
+          >Submit Changes</v-btn
+        >
+        <v-spacer></v-spacer>
+        <!-- <CustomDialog
             :action="() => deleteTodo()"
             color="red"
             icon="mdi-delete"
@@ -94,10 +94,9 @@
               Are you sure you want to delete this todo?
             </template>
           </CustomDialog> -->
-          <v-btn color="secondary" @click="() => (editTodoDialogOpen = false)"
-            >Cancel</v-btn
-          >
-        </div>
+        <v-btn color="secondary" @click="() => (editTodoDialogOpen = false)"
+          >Cancel</v-btn
+        >
       </v-card-actions>
     </v-card>
   </v-dialog>

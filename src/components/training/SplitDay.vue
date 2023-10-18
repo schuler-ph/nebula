@@ -55,11 +55,23 @@
           :class="wd.contentLength !== 0 ? 'ml-1' : ''"
           class="splitDayBorder"
           :style="'border-color: ' + wd.color + ';'"
-          prepend-icon="mdi-checkbox-marked-circle-outline"
+          prepend-icon="mdi-repeat-variant"
           color="transparent"
         >
           {{ wd.doneSubTodos }} /
           {{ totalSubTodos }}
+        </v-btn>
+        <v-btn
+          v-if="wd.linkedTodos.length !== 0"
+          :class="
+            wd.contentLength !== 0 || isAfter(new Date(), wd.date) ? 'ml-1' : ''
+          "
+          prepend-icon="mdi-flag-checkered"
+          color="transparent"
+          class="splitDayBorder"
+          :style="'border-color: ' + wd.color + ';'"
+        >
+          {{ wd.linkedTodos.length }}
         </v-btn>
       </div>
       <div>

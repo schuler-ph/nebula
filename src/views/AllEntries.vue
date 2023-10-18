@@ -16,7 +16,7 @@ import DiaryEntry from "@/components/diary/DiaryEntry.vue";
 import { useStorageStore } from "@/store/storageStore";
 
 const diaryEntries = ref<Row<"diary">[] | null>([]);
-const { allEntrys, initDiary } = useStorageStore();
+const { allEntries: allEntrys, initDiary } = useStorageStore();
 
 async function getEntries() {
   await initDiary();

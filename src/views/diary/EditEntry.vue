@@ -22,20 +22,36 @@
       ></v-text-field>
     </v-container>
 
-    <v-col cols="12" class="mb-2">
-      <v-sheet class="bg-deep-purple-lighten-4 ma-1" height="100%" rounded="lg">
-        <v-textarea
-          v-model="content"
-          :label="title"
-          class="pa-2"
-          variant="solo-filled"
-          no-resize
-          counter
-          persistent-counter
-        >
-        </v-textarea>
-      </v-sheet>
-    </v-col>
+    <v-sheet
+      rounded="lg"
+      class="bg-deep-purple-lighten-4 ma-1 pa-3"
+      v-if="linkedTodos && linkedTodos.length > 0"
+    >
+      <v-card class="pa-3">
+        <div class="d-flex flex-row" v-for="link in linkedTodos">
+          <span>{{ capFirst(link.name) }}</span>
+          <v-spacer></v-spacer>
+          <span>{{ capFirst(link.category + " " + link.parent) }}</span>
+        </div></v-card
+      >
+    </v-sheet>
+
+    <v-sheet
+      class="bg-deep-purple-lighten-4 ma-1 my-3"
+      height="100%"
+      rounded="lg"
+    >
+      <v-textarea
+        v-model="content"
+        :label="title"
+        class="pa-3"
+        variant="solo"
+        no-resize
+        counter
+        persistent-counter
+      >
+      </v-textarea>
+    </v-sheet>
 
     <TodoCollection @update:todoDaily="(t) => (todoDaily = t)" />
 
@@ -120,8 +136,9 @@
 </template>
 
 <script setup lang="ts">
+import { capFirst } from "@/helper/stringHelper";
 import { ref } from "vue";
-import { InsertDto, UpdateDto } from "@/types/supabaseHelper";
+import { InsertDto, Row, UpdateDto } from "@/types/supabaseHelper";
 import { getUserId, supabase } from "@/lib/supabaseClient";
 import router from "@/router";
 import { useRoute } from "vue-router";
@@ -147,10 +164,24 @@ const { date, title, content, todoDaily, currentWeight, weightSlider } =
 const cancelDialog = ref(false);
 let oldEntry: UpdateDto<"diary">;
 
-const { allEntrys, initDiarySingle } = useStorageStore();
+const { allEntries, allTodos, initDiarySingle } = useStorageStore();
+const linkedTodos = ref<{ name: string; category: string; parent: string }[]>(
+  []
+);
 
 onMounted(async () => {
-  const entry = allEntrys.find((e) => e.day === day);
+  const entry = allEntries.find((e) => e.day === day);
+
+  allTodos.forEach((at) => {
+    if (at.linked_date?.split(" ")[0] === day && !at.done) {
+      const parent = allTodos.find((parent) => parent.id === at.subtodo_of)!;
+      linkedTodos.value.push({
+        name: at.name,
+        category: at.category,
+        parent: parent.name,
+      });
+    }
+  });
 
   if (entry !== undefined) {
     // day found
@@ -244,7 +275,7 @@ function cancelUpdate() {
 }
 
 function getLatestWeight() {
-  const req = allEntrys.filter((ae) => ae.currentWeight !== null);
+  const req = allEntries.filter((ae) => ae.currentWeight !== null);
   currentWeight.value = req[0].currentWeight;
   centerSlider("force");
 }

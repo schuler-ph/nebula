@@ -23,6 +23,10 @@ Future updates will bring a meal planner (calculate your kcal & macro goals) and
 The application is already usable through netlify under <a href="https://magnificent-rugelach-0a7290.netlify.app/">this link</a>.
 You cannot sign up for an account yet.
 
+## Testers
+
+A big feature that is still missing, which is also inhibiting me from releasing the app, is that every word you write in this app (diary entries, names of your todos and subtodos, exercises and splits) <b>does NOT get encrypted</b> yet. Everything is stored as plain text in the database. If anyone knows how I could encrypt and decrypt the data with the user's password, please let me know. For now, please just test the features and don't use the app for personal diary entries.
+
 ## Features
 
 ### Diary

@@ -1,15 +1,7 @@
 <template>
   <v-sheet rounded="lg" class="pa-5">
-    <v-label>New Todo Name</v-label>
-    <v-text-field
-      v-model="newTodoText"
-      variant="solo"
-      ref="textFieldRef"
-    ></v-text-field>
     <div class="d-flex align-center mb-3">
-      <div></div>
-      <v-spacer />
-      <v-btn @click="() => addNewTodo(null)"> New Todo </v-btn>
+      <v-btn @click="openNewTodoDialog"> New Todo </v-btn>
       <v-spacer />
       <v-btn
         variant="tonal"
@@ -43,8 +35,43 @@
           {{ capFirst(todo.name) }}
         </v-expansion-panel-title>
         <v-expansion-panel-text>
-          <div class="d-flex justify-center mt-1 mb-3">
-            <v-btn @click="() => addNewTodo(todo.id)"> New Subtodo </v-btn>
+          <div
+            class="d-flex mt-1"
+            :class="smAndDown ? 'flex-column align-center' : 'flex-row'"
+          >
+            <v-btn
+              class="mb-3"
+              @click="
+                () => {
+                  editTodoSubTodoOf = todo.id;
+                  openNewTodoDialog();
+                }
+              "
+            >
+              New Subtodo
+            </v-btn>
+            <v-spacer />
+            <CustomDialog
+              text="not done"
+              variant="tonal"
+              class="mb-3"
+              :class="smAndDown ? '' : 'mr-2'"
+              :action="() => allSubTodosNotDone(todo.subtodos)"
+            >
+              <template v-slot:content>
+                Are you sure you want to set all subtodos to not done?
+              </template>
+            </CustomDialog>
+            <CustomDialog
+              variant="tonal"
+              text="done"
+              class="mb-3"
+              :action="() => allSubTodosDone(todo.subtodos)"
+            >
+              <template v-slot:content>
+                Are you sure you want to set all subtodos to done?
+              </template>
+            </CustomDialog>
           </div>
           <v-divider class="mb-5" :thickness="2"></v-divider>
           <v-sheet
@@ -59,6 +86,7 @@
               @click="
                 () => {
                   editTodoId = sub.id;
+                  editTodoSubTodoOf = todo.id;
                   openEditDialog();
                 }
               "
@@ -66,6 +94,9 @@
             </v-btn>
             <div>
               {{ capFirst(sub.name) }}
+              <div v-if="sub.linked_date" class="text-body-2 text-deep-purple">
+                {{ sub.linked_date }}
+              </div>
             </div>
           </v-sheet>
         </v-expansion-panel-text>
@@ -76,35 +107,71 @@
       <div>No todos yet...</div>
     </div>
 
-    <v-dialog v-model="editTodoDialogOpen" width="500">
-      <v-card>
-        <v-card-text>
-          <v-text-field label="Title" v-model="editTodoText"></v-text-field>
+    <v-dialog
+      v-model="editTodoDialogOpen"
+      width="500"
+      :fullscreen="xs"
+      persistent
+    >
+      <v-card class="overflow-visible">
+        <v-card-title
+          >{{ editTodoId ? "Edit" : "New" }}
+          {{ editTodoSubTodoOf ? "Subtodo" : "Todo" }}</v-card-title
+        >
+        <v-card-text class="d-flex flex-column">
+          <div>
+            <v-text-field label="Title" v-model="editTodoText"></v-text-field>
+            <v-switch
+              v-if="editTodoId"
+              label="Done"
+              color="primary"
+              v-model="editTodoStatus"
+            ></v-switch>
+          </div>
+          <v-spacer />
+          <div>Linked Dates:</div>
+          <VueDatePicker
+            v-model="editTodoLinkedDates"
+            model-type="yyyy-MM-dd HH:mm"
+          />
           <v-switch
-            label="Done"
+            label="Include time in linked date"
             color="primary"
-            v-model="editTodoStatus"
+            v-model="editTodoIncludeTime"
           ></v-switch>
         </v-card-text>
         <v-card-actions>
-          <div class="d-flex">
-            <v-btn color="primary" @click="() => submitEditTodo()"
-              >Submit Changes</v-btn
-            >
-            <CustomDialog
-              :action="() => deleteTodo()"
-              color="red"
-              icon="mdi-delete"
-              size="small"
-            >
-              <template v-slot:content>
-                Are you sure you want to delete this todo?
-              </template>
-            </CustomDialog>
-            <v-btn color="secondary" @click="() => (editTodoDialogOpen = false)"
-              >Cancel</v-btn
-            >
-          </div>
+          <v-btn
+            color="primary"
+            @click="
+              () => {
+                if (editTodoId) submitEditTodo();
+                else addNewTodo();
+              }
+            "
+          >
+            {{
+              editTodoId
+                ? "save changes"
+                : "add new " + (editTodoSubTodoOf ? "subtodo" : "todo")
+            }}</v-btn
+          >
+          <v-spacer></v-spacer>
+          <CustomDialog
+            v-if="editTodoId"
+            :action="() => deleteTodo()"
+            color="red"
+            icon="mdi-delete"
+            size="small"
+          >
+            <template v-slot:content>
+              Are you sure you want to delete this todo?
+            </template>
+          </CustomDialog>
+          <v-spacer></v-spacer>
+          <v-btn color="secondary" @click="() => closeTodoDialog()"
+            >Cancel</v-btn
+          >
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -113,36 +180,50 @@
 
 <script setup lang="ts">
 import { getUserId, supabase } from "@/lib/supabaseClient";
-import { InsertDto, Row } from "@/types/supabaseHelper";
+import { InsertDto, Row, UpdateDto } from "@/types/supabaseHelper";
 import { ref } from "vue";
 import { onMounted } from "vue";
 import { capFirst } from "@/helper/stringHelper";
 import CustomDialog from "@/components/generic/CustomDialog.vue";
 import { useDisplay } from "vuetify";
 import { useStorageStore } from "@/store/storageStore";
-import { getLongtermTodos } from "@/store/storage/todos";
+import { getLongtermTodos, TodoTemplate } from "@/store/storage/todos";
 import { useSnackbarStore } from "@/store/snackbarStore";
 import { onBeforeRouteLeave, useRoute } from "vue-router";
 import { watch } from "vue";
 import { useSettingsStore } from "@/store/settingsStore";
 import { storeToRefs } from "pinia";
 
-const { smAndDown } = useDisplay();
+const { smAndDown, xs } = useDisplay();
 const { newSnackbarMessage } = useSnackbarStore();
 
-const newTodoText = ref("");
-const textFieldRef = ref();
-
 const editTodoDialogOpen = ref(false);
-const editTodoId = ref<string>();
+const editTodoId = ref<string>("");
 const editTodoText = ref("");
 const editTodoTime = ref<Date>();
 const editTodoStatus = ref(false);
+const editTodoLinkedDates = ref<string>();
+const editTodoSubTodoOf = ref<string>("");
+const editTodoIncludeTime = ref(false);
+
+const openNewTodoDialog = () => {
+  editTodoDialogOpen.value = true;
+};
+
+const closeTodoDialog = () => {
+  editTodoId.value = "";
+  editTodoText.value = "";
+  editTodoStatus.value = false;
+  editTodoLinkedDates.value = "";
+  editTodoSubTodoOf.value = "";
+  editTodoDialogOpen.value = false;
+};
 
 const openEditDialog = () => {
   const { allTodos } = useStorageStore();
   const todoToEdit = allTodos.find((at) => at.id === editTodoId.value);
   if (todoToEdit) {
+    editTodoLinkedDates.value = todoToEdit.linked_date!;
     editTodoText.value = todoToEdit.name;
     editTodoStatus.value = todoToEdit.done;
     editTodoTime.value = new Date();
@@ -159,19 +240,46 @@ const deleteTodo = async () => {
   await getTodoTemplate();
 };
 const submitEditTodo = async () => {
-  editTodoDialogOpen.value = false;
-  await supabase
-    .from("todo")
-    .update({
-      name: editTodoText.value,
-      updated_at: editTodoTime.value!.toUTCString(),
-      done: editTodoStatus.value,
-    })
-    .eq("id", editTodoId.value);
+  const update: UpdateDto<"todo"> = {
+    name: editTodoText.value,
+    updated_at: editTodoTime.value!.toUTCString(),
+    done: editTodoStatus.value,
+    linked_date: editTodoIncludeTime.value
+      ? editTodoLinkedDates.value
+      : editTodoLinkedDates.value?.split(" ")[0],
+  };
+  await supabase.from("todo").update(update).eq("id", editTodoId.value);
   await getTodoTemplate();
+  closeTodoDialog();
 };
 
-const ltTodos = ref();
+const allSubTodosDone = async (subtodos: Row<"todo">[] | undefined) => {
+  if (subtodos) {
+    subtodos.forEach(async (st) => {
+      if (!st.done) {
+        await supabase.from("todo").update({ done: true }).eq("id", st.id);
+      }
+    });
+  }
+  setTimeout(async () => {
+    await initTodosSingle();
+  }, 1000);
+};
+
+const allSubTodosNotDone = async (subtodos: Row<"todo">[] | undefined) => {
+  if (subtodos) {
+    subtodos.forEach(async (st) => {
+      if (st.done) {
+        await supabase.from("todo").update({ done: false }).eq("id", st.id);
+      }
+    });
+  }
+  setTimeout(async () => {
+    await initTodosSingle();
+  }, 1000);
+};
+
+const ltTodos = ref<TodoTemplate[]>();
 const props = defineProps(["category"]);
 const { showLtDoneTodos } = storeToRefs(useSettingsStore());
 
@@ -198,23 +306,25 @@ async function getTodoTemplate() {
   alignTodos(props.category);
 }
 
-async function addNewTodo(parent: string | null) {
-  if (newTodoText.value !== "") {
+async function addNewTodo() {
+  if (editTodoText.value !== "") {
     const todo: InsertDto<"todo"> = {
       category: props.category,
-      name: newTodoText.value,
+      name: editTodoText.value,
       user_id: await getUserId(),
-      subtodo_of: parent,
+      subtodo_of: editTodoSubTodoOf.value ? editTodoSubTodoOf.value : null,
+      linked_date: editTodoIncludeTime.value
+        ? editTodoLinkedDates.value
+        : editTodoLinkedDates.value?.split(" ")[0],
     };
     const { error } = await supabase.from("todo").insert(todo);
     if (error === null) {
-      newTodoText.value = "";
       await getTodoTemplate();
     }
   } else {
-    textFieldRef.value.focus();
     newSnackbarMessage("Define the name of the todo first!", "error");
   }
+  closeTodoDialog();
 }
 
 function check(e: Event) {
