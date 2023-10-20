@@ -41,20 +41,25 @@ export const getLongtermTodos = (
   let longtermTodos: TodoTemplate[] = [];
 
   const { allTodos } = useStorageStore();
-
-  let req = allTodos
-    .filter((at) => at.category === category)
-    .sort((a, b) => {
-      if (a.updated_at < b.updated_at) return 1;
-      else if (a.updated_at > b.updated_at) return -1;
-      return 0;
-    })
+  const atCategory = allTodos.filter((at) => at.category === category);
+  const atLinked = atCategory
+    .filter((at) => at.linked_date !== null)
     .sort((a, b) => {
       if (a.linked_date! < b.linked_date!) return -1;
       if (a.linked_date! > b.linked_date!) return 1;
       return 0;
     });
-  // latest updated_at is on top
+
+  const atNotLinked = atCategory
+    .filter((at) => at.linked_date === null)
+    .sort((a, b) => {
+      if (a.updated_at < b.updated_at) return 1;
+      else if (a.updated_at > b.updated_at) return -1;
+      return 0;
+    });
+
+  atLinked.push(...atNotLinked);
+  let req = atLinked;
 
   if (!showLtDoneTodos) {
     req = req.filter((r) => r.done !== true);

@@ -113,6 +113,7 @@ const tempDialogOpen = ref(false);
 const tempSplitName = ref("");
 
 const openDialog = (name: string) => {
+  if (name === "") selectedSplit.value = undefined;
   tempSplitName.value = name;
   tempDialogOpen.value = true;
 };

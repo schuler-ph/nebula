@@ -32,7 +32,7 @@
             @click.native="check($event)"
           >
           </v-btn>
-          {{ capFirst(todo.name) }}
+          {{ capFirst(todo.name) + ` (${todo.subtodos?.length})` }}
         </v-expansion-panel-title>
         <v-expansion-panel-text>
           <div
@@ -114,21 +114,28 @@
       persistent
     >
       <v-card class="overflow-visible">
-        <v-card-title
-          >{{ editTodoId ? "Edit" : "New" }}
-          {{ editTodoSubTodoOf ? "Subtodo" : "Todo" }}</v-card-title
-        >
-        <v-card-text class="d-flex flex-column">
+        <v-card-title class="d-flex flex-row align-center">
           <div>
-            <v-text-field label="Title" v-model="editTodoText"></v-text-field>
-            <v-switch
-              v-if="editTodoId"
-              label="Done"
-              color="primary"
-              v-model="editTodoStatus"
-            ></v-switch>
+            {{ editTodoId ? "Edit" : "New" }}
+            {{ editTodoSubTodoOf ? "Subtodo" : "Todo" }}
           </div>
           <v-spacer />
+          <v-btn
+            class="p-0"
+            variant="text"
+            color="grey"
+            @click="() => closeTodoDialog()"
+            >Cancel</v-btn
+          >
+        </v-card-title>
+        <v-card-text>
+          <v-text-field label="Title" v-model="editTodoText"></v-text-field>
+          <v-switch
+            v-if="editTodoId"
+            label="Done"
+            color="primary"
+            v-model="editTodoStatus"
+          ></v-switch>
           <div>Linked Dates:</div>
           <VueDatePicker
             v-model="editTodoLinkedDates"
@@ -139,10 +146,25 @@
             color="primary"
             v-model="editTodoIncludeTime"
           ></v-switch>
+
+          <CustomDialog
+            v-if="editTodoId"
+            :action="() => deleteTodo()"
+            color="red"
+            text="Delete todo"
+            size="small"
+          >
+            <template v-slot:content>
+              Are you sure you want to delete this todo?
+            </template>
+          </CustomDialog>
         </v-card-text>
         <v-card-actions>
+          <v-spacer />
           <v-btn
+            variant="flat"
             color="primary"
+            class="px-5"
             @click="
               () => {
                 if (editTodoId) submitEditTodo();
@@ -156,22 +178,7 @@
                 : "add new " + (editTodoSubTodoOf ? "subtodo" : "todo")
             }}</v-btn
           >
-          <v-spacer></v-spacer>
-          <CustomDialog
-            v-if="editTodoId"
-            :action="() => deleteTodo()"
-            color="red"
-            icon="mdi-delete"
-            size="small"
-          >
-            <template v-slot:content>
-              Are you sure you want to delete this todo?
-            </template>
-          </CustomDialog>
-          <v-spacer></v-spacer>
-          <v-btn color="secondary" @click="() => closeTodoDialog()"
-            >Cancel</v-btn
-          >
+          <v-spacer />
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -202,7 +209,7 @@ const editTodoId = ref<string>("");
 const editTodoText = ref("");
 const editTodoTime = ref<Date>();
 const editTodoStatus = ref(false);
-const editTodoLinkedDates = ref<string>();
+const editTodoLinkedDates = ref<string | null>(null);
 const editTodoSubTodoOf = ref<string>("");
 const editTodoIncludeTime = ref(false);
 
@@ -214,16 +221,24 @@ const closeTodoDialog = () => {
   editTodoId.value = "";
   editTodoText.value = "";
   editTodoStatus.value = false;
-  editTodoLinkedDates.value = "";
+  editTodoLinkedDates.value = null;
   editTodoSubTodoOf.value = "";
   editTodoDialogOpen.value = false;
+  editTodoIncludeTime.value = false;
 };
 
 const openEditDialog = () => {
   const { allTodos } = useStorageStore();
   const todoToEdit = allTodos.find((at) => at.id === editTodoId.value);
   if (todoToEdit) {
-    editTodoLinkedDates.value = todoToEdit.linked_date!;
+    if (todoToEdit.linked_date) {
+      if (todoToEdit.linked_date!.length === 10)
+        editTodoLinkedDates.value = todoToEdit.linked_date + " 12:00";
+      else {
+        editTodoLinkedDates.value = todoToEdit.linked_date!;
+        editTodoIncludeTime.value = true;
+      }
+    }
     editTodoText.value = todoToEdit.name;
     editTodoStatus.value = todoToEdit.done;
     editTodoTime.value = new Date();
@@ -240,16 +255,24 @@ const deleteTodo = async () => {
   await getTodoTemplate();
 };
 const submitEditTodo = async () => {
+  if (!editTodoLinkedDates.value) editTodoLinkedDates.value = null;
+  else
+    editTodoLinkedDates.value = editTodoIncludeTime.value
+      ? editTodoLinkedDates.value
+      : editTodoLinkedDates.value?.split(" ")[0];
   const update: UpdateDto<"todo"> = {
     name: editTodoText.value,
     updated_at: editTodoTime.value!.toUTCString(),
     done: editTodoStatus.value,
-    linked_date: editTodoIncludeTime.value
-      ? editTodoLinkedDates.value
-      : editTodoLinkedDates.value?.split(" ")[0],
+    linked_date: editTodoLinkedDates.value,
   };
-  await supabase.from("todo").update(update).eq("id", editTodoId.value);
-  await getTodoTemplate();
+  const { error } = await supabase
+    .from("todo")
+    .update(update)
+    .eq("id", editTodoId.value);
+  if (error === null) {
+    await getTodoTemplate();
+  } else console.log(error);
   closeTodoDialog();
 };
 
@@ -307,6 +330,7 @@ async function getTodoTemplate() {
 }
 
 async function addNewTodo() {
+  if (!editTodoLinkedDates.value) editTodoLinkedDates.value = null;
   if (editTodoText.value !== "") {
     const todo: InsertDto<"todo"> = {
       category: props.category,

@@ -44,11 +44,17 @@
       @open-edit-dialog="(exercise) => openEditDialog(exercise)"
     />
   </v-sheet>
-  <v-dialog v-model="tempDialogOpen" width="600">
+  <v-dialog v-model="tempDialogOpen" width="600" :fullscreen="xs" persistent>
     <v-card>
-      <v-card-title>{{
-        tempId ? "Edit Exercise" : "New Exercise"
-      }}</v-card-title>
+      <v-card-title class="d-flex flex-row align-center"
+        ><div>
+          {{ tempId ? "Edit Exercise" : "New Exercise" }}
+        </div>
+        <v-spacer />
+        <v-btn variant="text" color="grey" @click="() => cancelDialog()"
+          >Cancel</v-btn
+        ></v-card-title
+      >
       <v-card-text>
         <v-text-field
           label="Name of exercise"
@@ -87,8 +93,6 @@
         </div>
       </v-card-text>
       <v-card-actions>
-        <v-btn @click="() => cancelDialog()">Cancel</v-btn>
-        <v-spacer v-if="tempId !== undefined"></v-spacer>
         <CustomDialog
           v-if="tempId !== undefined"
           :action="deleteExercise"
