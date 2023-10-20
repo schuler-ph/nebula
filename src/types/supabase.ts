@@ -178,6 +178,7 @@ export interface Database {
         Row: {
           category: string
           created_at: string
+          description: string
           done: boolean
           id: string
           inactive: boolean
@@ -191,6 +192,7 @@ export interface Database {
         Insert: {
           category: string
           created_at?: string
+          description?: string
           done?: boolean
           id?: string
           inactive?: boolean
@@ -204,6 +206,7 @@ export interface Database {
         Update: {
           category?: string
           created_at?: string
+          description?: string
           done?: boolean
           id?: string
           inactive?: boolean

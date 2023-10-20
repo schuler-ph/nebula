@@ -76,6 +76,11 @@ const routes = [
         name: "Login",
         component: () => import("@/views/auth/Login.vue"),
       },
+      // {
+      //   path: "/auth/signup",
+      //   name: "Signup",
+      //   component: () => import("@/views/auth/Signup.vue"),
+      // },
     ],
   },
   {
@@ -96,17 +101,15 @@ const router = createRouter({
   routes,
 });
 
-// router.beforeEach(async (to, from) => {
-
-//   if (!auth_valid && to.name !== "Login") {
-//     return { name: "Login" };
-//   }
-// });
-
 router.beforeEach((to, from, next) => {
   const { auth_valid } = useAuthStore();
-  if (to.name !== "Login" && !auth_valid) next({ name: "Login" });
-  else next();
+  const allowedRoutes = ["Login", "Signup"];
+
+  if (!auth_valid && !allowedRoutes.includes(to.name as string)) {
+    next({ name: "Login" });
+  } else {
+    next();
+  }
 });
 
 export default router;

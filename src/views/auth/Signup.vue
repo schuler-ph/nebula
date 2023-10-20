@@ -7,7 +7,7 @@
   >
     <v-img :src="nebulaLogo" height="100"></v-img>
     <span class="text-h5 mb-10 mt-3"
-      >Login to the
+      >Sign-up for the
       <span class="font-weight-black nebulaTextGradient">Nebula</span></span
     >
     <v-form v-model="valid" class="w-100">
@@ -36,23 +36,19 @@
       <v-btn
         elevation="10"
         class="text-h6 font-weight-bold nebulaBgGradient px-5 d-flex"
-        @click="submitLogin"
+        @click="submitSignup"
         prepend-icon="mdi-login"
-        >Login</v-btn
+        >Sign-up</v-btn
       >
     </v-card-actions>
     <div class="mt-5 d-flex flex-column align-center text-body-2">
-      <div>Don't have an account yet?</div>
+      <div>Already have an account?</div>
       <v-btn
         variant="text"
-        @click="
-          () => {
-            // router.push({ name: 'Signup' });
-          }
-        "
+        @click="() => router.push({ name: 'Login' })"
         class="nebulaTextGradient"
       >
-        Request access
+        Login
       </v-btn>
     </div>
   </v-card>
@@ -60,18 +56,21 @@
 </template>
 
 <script setup lang="ts">
+import useAuth from "@/hooks/useAuth";
 import { ref } from "vue";
+import { useSnackbarStore } from "@/store/snackbarStore";
 import { storeToRefs } from "pinia";
 import { useAuthStore } from "@/store/authStore";
-import useAuth from "@/hooks/useAuth";
 import nebulaLogo from "@/assets/logo.svg";
-import { useSnackbarStore } from "@/store/snackbarStore";
 import router from "@/router/index";
 
 const { newSnackbarMessage } = useSnackbarStore();
+const email = ref("");
+const password = ref("");
+const { auth_loading } = storeToRefs(useAuthStore());
+const { signup } = useAuth();
 
 const valid = ref(false);
-const email = ref("");
 const emailRules = [
   (value: string) => {
     if (value) return true;
@@ -82,7 +81,6 @@ const emailRules = [
     return "E-mail must be valid.";
   },
 ];
-const password = ref("");
 const passwordRules = [
   (value: string) => {
     if (value) return true;
@@ -91,12 +89,13 @@ const passwordRules = [
 ];
 const showPassword = ref(false);
 
-const { login } = useAuth();
-const { auth_loading } = storeToRefs(useAuthStore());
-async function submitLogin() {
-  const error = await login(email.value, password.value);
+async function submitSignup() {
+  const error = await signup(email.value, password.value);
+  console.log(error);
   if (error !== null) {
-    newSnackbarMessage(error.message, "error");
+    newSnackbarMessage("Signup failed!", "error");
+  } else {
+    newSnackbarMessage("A new account has been requested!", "info");
   }
 }
 </script>

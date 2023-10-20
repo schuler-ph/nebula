@@ -43,7 +43,7 @@
     >
       <v-textarea
         v-model="content"
-        :label="title"
+        label="Diary content"
         class="pa-3"
         variant="solo"
         no-resize

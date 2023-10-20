@@ -32,7 +32,14 @@
             @click.native="check($event)"
           >
           </v-btn>
-          {{ capFirst(todo.name) + ` (${todo.subtodos?.length})` }}
+          <div class="d-flex flex-column">
+            <span>
+              {{ capFirst(todo.name) + ` (${todo.subtodos?.length})` }}
+            </span>
+            <span class="text-deep-purple text-body-1">{{
+              capFirst(todo.description)
+            }}</span>
+          </div>
         </v-expansion-panel-title>
         <v-expansion-panel-text>
           <div
@@ -130,6 +137,11 @@
         </v-card-title>
         <v-card-text>
           <v-text-field label="Title" v-model="editTodoText"></v-text-field>
+          <v-textarea
+            v-model="editTodoDescription"
+            label="Description"
+            no-resize
+          />
           <v-switch
             v-if="editTodoId"
             label="Done"
@@ -207,6 +219,7 @@ const { newSnackbarMessage } = useSnackbarStore();
 const editTodoDialogOpen = ref(false);
 const editTodoId = ref<string>("");
 const editTodoText = ref("");
+const editTodoDescription = ref("");
 const editTodoTime = ref<Date>();
 const editTodoStatus = ref(false);
 const editTodoLinkedDates = ref<string | null>(null);
@@ -220,6 +233,7 @@ const openNewTodoDialog = () => {
 const closeTodoDialog = () => {
   editTodoId.value = "";
   editTodoText.value = "";
+  editTodoDescription.value = "";
   editTodoStatus.value = false;
   editTodoLinkedDates.value = null;
   editTodoSubTodoOf.value = "";
@@ -240,6 +254,7 @@ const openEditDialog = () => {
       }
     }
     editTodoText.value = todoToEdit.name;
+    editTodoDescription.value = todoToEdit.description;
     editTodoStatus.value = todoToEdit.done;
     editTodoTime.value = new Date();
     editTodoDialogOpen.value = true;
@@ -262,6 +277,7 @@ const submitEditTodo = async () => {
       : editTodoLinkedDates.value?.split(" ")[0];
   const update: UpdateDto<"todo"> = {
     name: editTodoText.value,
+    description: editTodoDescription.value,
     updated_at: editTodoTime.value!.toUTCString(),
     done: editTodoStatus.value,
     linked_date: editTodoLinkedDates.value,
@@ -335,6 +351,7 @@ async function addNewTodo() {
     const todo: InsertDto<"todo"> = {
       category: props.category,
       name: editTodoText.value,
+      description: editTodoDescription.value,
       user_id: await getUserId(),
       subtodo_of: editTodoSubTodoOf.value ? editTodoSubTodoOf.value : null,
       linked_date: editTodoIncludeTime.value
